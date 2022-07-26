@@ -4,7 +4,10 @@
     <option name="filePathToZoomLevelMap">
       <map>
         <entry key="..\:/Android Course/MyProjects/interviews/AstronomyPictureOfTheDay/app/src/main/res/layout/activity_main.xml" value="0.146875" />
+        <entry key="..\:/Android Course/MyProjects/interviews/AstronomyPictureOfTheDay/app/src/main/res/layout/big_photo_list_item.xml" value="0.2" />
         <entry key="..\:/Android Course/MyProjects/interviews/AstronomyPictureOfTheDay/app/src/main/res/layout/fragment_photo_list.xml" value="0.152" />
+        <entry key="..\:/Android Course/MyProjects/interviews/AstronomyPictureOfTheDay/app/src/main/res/layout/photo_list_item.xml" value="0.264" />
+        <entry key="..\:/Android Course/MyProjects/interviews/AstronomyPictureOfTheDay/app/src/main/res/layout/regular_photo_list_item.xml" value="0.264" />
       </map>
     </option>
   </component>
