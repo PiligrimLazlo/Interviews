@@ -36,6 +36,9 @@ class PhotoListViewModel : ViewModel() {
 
     private fun getPeriod(offset: Int): Pair<String, String> {
         val calendar = Calendar.getInstance()
+        //TODO delete
+        calendar.add(Calendar.HOUR, -5)
+
         val sdf = SimpleDateFormat(SERVER_DATE_FORMAT, Locale.getDefault())
         sdf.timeZone = TimeZone.getTimeZone("GMT+3")
         val endDate = sdf.format(calendar.time)

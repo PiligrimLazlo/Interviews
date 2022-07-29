@@ -1,5 +1,5 @@
 <resources>
     <string name="app_name">AstronomyPictureOfTheDay</string>
     <string name="top_photo_image_description">Top Photo Image</string>
-    <string name="today_s_top_image">Today\'s Top Image</string>
+    <string name="dark_mode">Dark mode</string>
 </resources>
