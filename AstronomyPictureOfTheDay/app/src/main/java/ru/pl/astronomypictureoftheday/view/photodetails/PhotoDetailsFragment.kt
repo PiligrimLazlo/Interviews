@@ -1,10 +1,15 @@
 package ru.pl.astronomypictureoftheday.view.photodetails
 
+import android.annotation.SuppressLint
+import android.graphics.text.LineBreaker
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
+import android.text.Layout
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -13,6 +18,7 @@ import com.bumptech.glide.Glide
 import ru.pl.astronomypictureoftheday.R
 import ru.pl.astronomypictureoftheday.api.TopPhotoEntity
 import ru.pl.astronomypictureoftheday.databinding.FragmentPhotoDetailsBinding
+import ru.pl.astronomypictureoftheday.utils.toDefaultFormattedDate
 
 class PhotoDetailsFragment: Fragment() {
 
@@ -40,11 +46,17 @@ class PhotoDetailsFragment: Fragment() {
         _binding = null
     }
 
+
+    @SuppressLint("WrongConstant")
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
         val topPhotoEntity = args.photoEntity
+
         binding.apply {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                descriptionDetail.justificationMode =  Layout.JUSTIFICATION_MODE_INTER_WORD
+            }
             descriptionDetail.text = topPhotoEntity.explanation
             Glide.with(root.context)
                 .load(topPhotoEntity.imageUrl)
@@ -52,6 +64,8 @@ class PhotoDetailsFragment: Fragment() {
                 .into(imageDetail)
 
             (activity as AppCompatActivity).supportActionBar?.title = topPhotoEntity.title
+
+            dateDetail.text = topPhotoEntity.date.toDefaultFormattedDate()
         }
     }
 

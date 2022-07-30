@@ -20,7 +20,7 @@
         <item name="color">@color/text_color</item>
     </style>
 
-    <style name="regular_text_view_style">
+    <style name="regular_text_view_style" parent="text_view_style">
         <item name="android:textSize">16sp</item>
         <item name="android:textStyle">bold</item>
         <item name="android:layout_marginBottom">8dp</item>
