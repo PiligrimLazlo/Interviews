@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <ImageView
+            android:id="@+id/image_detail"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:scaleType="centerCrop"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:src="@drawable/placeholder_400x400" />
+
+        <TextView
+            android:id="@+id/description_detail"
+            style="@style/regular_text_view_style"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="16dp"
+            android:lineSpacingExtra="4dp"
+            android:justificationMode="inter_word"
+            android:textStyle="normal"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/image_detail"
+            tools:text="Get out your red/blue glasses and check out this stereo view from lunar orbit. The 3D anaglyph was created from two photographs (AS11-44-6633, AS11-44-6634) taken by astronaut Michael Collins during the 1969 Apollo 11 mission. It features the lunar module ascent stage, dubbed The Eagle, rising to meet the command module in lunar orbit on July 21. Aboard the ascent stage are Neil Armstrong and Buzz Aldrin, the first to walk on the Moon. The smooth, dark area on the lunar surface is Mare Smythii located just below the equator on the extreme eastern edge of the Moon's near side.  Poised beyond the lunar horizon is our fair planet Earth." />
+
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</ScrollView>
+
+
+
+
+

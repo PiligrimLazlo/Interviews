@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/photoListFragment2">
+    <fragment
+        android:id="@+id/photoDetailsFragment"
+        android:name="ru.pl.astronomypictureoftheday.view.photodetails.PhotoDetailsFragment"
+        android:label="PhotoDetailsFragment" >
+        <argument
+            android:name="photoEntity"
+            app:argType="ru.pl.astronomypictureoftheday.api.TopPhotoEntity" />
+    </fragment>
+    <fragment
+        android:id="@+id/photoListFragment2"
+        android:name="ru.pl.astronomypictureoftheday.view.photolist.PhotoListFragment"
+        android:label="PhotoListFragment" >
+        <action
+            android:id="@+id/goToDetails"
+            app:destination="@id/photoDetailsFragment" />
+    </fragment>
+</navigation>

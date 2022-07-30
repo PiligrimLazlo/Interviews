@@ -2,4 +2,8 @@
 <resources>
     <color name="main_background">@color/dark_space</color>
     <color name="item_background">@color/light_sky</color>
+
+    <color name="toolbar_color">@color/light_sky</color>
+
+    <color name="text_color">@color/light_grey</color>
 </resources>

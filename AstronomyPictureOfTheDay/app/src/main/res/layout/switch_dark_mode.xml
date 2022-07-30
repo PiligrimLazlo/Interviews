@@ -6,11 +6,12 @@
 
     <TextView
         android:id="@+id/switcher_text"
-        style="@style/small_text_view"
+        style="@style/small_text_view_style"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="8dp"
         android:text="@string/dark_mode"
+        android:textColor="@color/light_grey"
         app:layout_constraintBottom_toBottomOf="@+id/switcher"
         app:layout_constraintEnd_toStartOf="@id/switcher"
         app:layout_constraintTop_toTopOf="@+id/switcher" />

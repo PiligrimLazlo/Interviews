@@ -1,8 +1,7 @@
-package ru.pl.astronomypictureoftheday.view
+package ru.pl.astronomypictureoftheday.view.photolist
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import androidx.core.view.size
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import ru.pl.astronomypictureoftheday.R
@@ -11,9 +10,13 @@ import ru.pl.astronomypictureoftheday.databinding.BigPhotoListItemBinding
 import ru.pl.astronomypictureoftheday.databinding.RegularPhotoListItemBinding
 import java.lang.IllegalArgumentException
 
+typealias OnPhotoClickListener = (TopPhotoEntity) -> Unit
+
 class PhotoListAdapter(
-    private val photoList: List<TopPhotoEntity>
+    private val photoList: List<TopPhotoEntity>,
+    private val onPhotoClickListener: OnPhotoClickListener
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         val inflater = LayoutInflater.from(parent.context)
         return if (viewType == VIEW_TYPE_BIG_ITEM) {
@@ -30,9 +33,9 @@ class PhotoListAdapter(
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         val photoItem = photoList[position]
         if (holder is RegularPhotoViewHolder)
-            holder.bind(photoItem)
+            holder.bind(photoItem, onPhotoClickListener)
         else if (holder is BigPhotoViewHolder)
-            holder.bind(photoItem)
+            holder.bind(photoItem, onPhotoClickListener)
     }
 
     override fun getItemCount(): Int = photoList.size
@@ -50,22 +53,30 @@ class PhotoListAdapter(
 
 class RegularPhotoViewHolder(private val binding: RegularPhotoListItemBinding) :
     RecyclerView.ViewHolder(binding.root) {
-    fun bind(topPhotoEntity: TopPhotoEntity) {
+    fun bind(topPhotoEntity: TopPhotoEntity, onPhotoClickListener: OnPhotoClickListener) {
         binding.topPhotoTv.text = topPhotoEntity.title
         Glide.with(binding.root.context)
             .load(topPhotoEntity.imageUrl)
             .placeholder(R.drawable.placeholder_200x200)
             .into(binding.topPhotoImage)
+
+        binding.root.setOnClickListener {
+            onPhotoClickListener(topPhotoEntity)
+        }
     }
 }
 
 class BigPhotoViewHolder(private val binding: BigPhotoListItemBinding) :
     RecyclerView.ViewHolder(binding.root) {
-    fun bind(topPhotoEntity: TopPhotoEntity) {
+    fun bind(topPhotoEntity: TopPhotoEntity, onPhotoClickListener: OnPhotoClickListener) {
         binding.topPhotoTv.text = topPhotoEntity.title
         Glide.with(binding.root.context)
             .load(topPhotoEntity.imageUrl)
             .placeholder(R.drawable.placeholder_400x400)
             .into(binding.topPhotoImage)
+
+        binding.root.setOnClickListener {
+            onPhotoClickListener(topPhotoEntity)
+        }
     }
 }

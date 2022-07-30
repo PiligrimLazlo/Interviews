@@ -9,10 +9,17 @@
     <color name="white">#FFFFFFFF</color>
 
     <color name="light_grey">#D9D9D9</color>
+    <color name="dark_grey">#2D2D2D</color>
 
     <color name="dark_space">#212a31</color>
     <color name="light_sky">#2F3C45</color>
 
+
+
     <color name="main_background">@color/white</color>
     <color name="item_background">@color/white</color>
+
+    <color name="toolbar_color">@color/light_sky</color>
+
+    <color name="text_color">@color/dark_grey</color>
 </resources>
