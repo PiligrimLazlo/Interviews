@@ -17,7 +17,7 @@
     <style name="text_view_style">
         <item name="android:gravity">center</item>
         <item name="fontFamily">roboto</item>
-        <item name="color">@color/text_color</item>
+        <item name="color">@color/main_color</item>
     </style>
 
     <style name="regular_text_view_style" parent="text_view_style">

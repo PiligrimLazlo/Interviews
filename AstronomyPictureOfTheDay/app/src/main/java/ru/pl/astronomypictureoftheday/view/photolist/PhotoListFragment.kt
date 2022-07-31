@@ -2,6 +2,7 @@ package ru.pl.astronomypictureoftheday.view.photolist
 
 import android.content.Context
 import android.os.Bundle
+import android.util.Log
 import android.view.*
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.view.MenuProvider
@@ -13,6 +14,9 @@ import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import com.google.android.material.switchmaterial.SwitchMaterial
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.conflate
+import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.launch
 import ru.pl.astronomypictureoftheday.R
 import ru.pl.astronomypictureoftheday.databinding.FragmentPhotoListBinding
@@ -63,12 +67,16 @@ class PhotoListFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        binding.progressBar.visibility = View.VISIBLE
+
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 photoListViewModel.topPhotos.collect { photoList ->
                     binding.photoGrid.adapter = PhotoListAdapter(photoList.reversed()) {
                         findNavController().navigate(PhotoListFragmentDirections.goToDetails(it))
                     }
+                    if (photoList.isNotEmpty()) binding.progressBar.visibility = View.GONE
+                    Log.d(TAG, "loaded")
                 }
             }
         }
