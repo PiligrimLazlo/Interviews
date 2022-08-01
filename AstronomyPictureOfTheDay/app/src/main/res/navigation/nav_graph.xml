@@ -9,7 +9,7 @@
         android:label="PhotoDetailsFragment" >
         <argument
             android:name="photoEntity"
-            app:argType="ru.pl.astronomypictureoftheday.api.TopPhotoEntity" />
+            app:argType="ru.pl.astronomypictureoftheday.model.TopPhotoEntity" />
     </fragment>
     <fragment
         android:id="@+id/photoListFragment2"

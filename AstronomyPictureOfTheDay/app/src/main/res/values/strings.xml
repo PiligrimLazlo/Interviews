@@ -3,4 +3,5 @@
     <string name="top_photo_image_description">Top Photo Image</string>
     <string name="dark_mode">Dark mode</string>
     <string name="binding_null_error">Cannot access binding because it is null. Is the view visible?</string>
+    <string name="retry">Retry</string>
 </resources>

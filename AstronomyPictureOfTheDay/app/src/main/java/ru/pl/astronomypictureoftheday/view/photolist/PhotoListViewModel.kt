@@ -4,76 +4,51 @@ import android.content.SharedPreferences
 import android.util.Log
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.viewModelScope
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
+import androidx.paging.PagingData
+import androidx.paging.cachedIn
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
-import ru.pl.astronomypictureoftheday.api.NasaPhotoRepository
-import ru.pl.astronomypictureoftheday.api.TopPhotoEntity
-import ru.pl.astronomypictureoftheday.utils.SERVER_DATE_FORMAT
-import java.text.SimpleDateFormat
-import java.util.*
+import ru.pl.astronomypictureoftheday.model.PreferencesRepository
+import ru.pl.astronomypictureoftheday.model.PreferencesRepository.Companion.THEME_LIGHT
+import ru.pl.astronomypictureoftheday.model.TopPhotoEntity
+import ru.pl.astronomypictureoftheday.model.api.NasaPhotoRepository
 
 private const val TAG = "PhotoListViewModel";
 
-class PhotoListViewModel(
-    private val sharedPrefs: SharedPreferences
-) : ViewModel() {
-    private val _topPhotos: MutableStateFlow<List<TopPhotoEntity>> = MutableStateFlow(emptyList())
-    val topPhotos: StateFlow<List<TopPhotoEntity>>
-        get() = _topPhotos.asStateFlow()
+class PhotoListViewModel : ViewModel() {
+    private val preferencesRepository = PreferencesRepository.get()
+    private val nasaPhotoRepository = NasaPhotoRepository()
+
+    private val _uiState: MutableStateFlow<PhotoUiState> = MutableStateFlow(PhotoUiState())
+    val uiState: StateFlow<PhotoUiState>
+        get() = _uiState.asStateFlow()
+
+    val topPhotoItems: Flow<PagingData<TopPhotoEntity>>
 
     init {
         viewModelScope.launch {
-            try {
-                val datePeriod = getPeriod(10)
-                val responseSeveralPhotos =
-                    NasaPhotoRepository().fetchTopPhoto(datePeriod.first, datePeriod.second)
-                _topPhotos.value = responseSeveralPhotos
-            } catch (e: Exception) {
-                Log.d(TAG, "Cannot load photo(s)", e)
+            preferencesRepository.storedTheme.collectLatest { storedTheme ->
+                try {
+                    _uiState.update { oldState ->
+                        oldState.copy(theme = storedTheme)
+                    }
+                } catch (ex: Exception) {
+                    Log.e(TAG, "Failed to fetch gallery items", ex)
+                }
             }
         }
 
-        initTheme()
+        topPhotoItems = nasaPhotoRepository.fetchTopPhotos().cachedIn(viewModelScope)
     }
 
-    private fun getPeriod(offset: Int): Pair<String, String> {
-        val calendar = Calendar.getInstance()
-        //TODO delete
-        calendar.add(Calendar.HOUR, -5)
-
-        val sdf = SimpleDateFormat(SERVER_DATE_FORMAT, Locale.getDefault())
-        sdf.timeZone = TimeZone.getTimeZone("GMT+3")
-        val endDate = sdf.format(calendar.time)
-        calendar.add(Calendar.DAY_OF_MONTH, -offset + 1)
-        val startDate = sdf.format((calendar.time))
-
-        return Pair(startDate, endDate)
-    }
-
-    fun setTheme(themeMode: Int, prefsMode: Int) {
-        AppCompatDelegate.setDefaultNightMode(themeMode)
-        saveTheme(prefsMode)
-    }
-
-    private fun initTheme() {
-        val savedTheme = getSavedTheme()
-        setTheme(
-            if (savedTheme == THEME_DARK) AppCompatDelegate.MODE_NIGHT_YES else AppCompatDelegate.MODE_NIGHT_NO,
-            savedTheme
-        )
-    }
-
-    private fun saveTheme(theme: Int) = sharedPrefs.edit().putInt(KEY_THEME, theme).apply()
-    fun getSavedTheme() = sharedPrefs.getInt(KEY_THEME, THEME_LIGHT)
-
-
-    companion object {
-        const val KEY_THEME = "prefs.theme"
-        const val THEME_LIGHT = 0
-        const val THEME_DARK = 1
+    fun setTheme(theme: Int) {
+        viewModelScope.launch {
+            preferencesRepository.setTheme(theme)
+        }
     }
 }
+
+data class PhotoUiState(
+    val theme: Int = THEME_LIGHT
+)

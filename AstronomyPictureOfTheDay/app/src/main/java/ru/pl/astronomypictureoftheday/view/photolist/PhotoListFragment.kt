@@ -1,31 +1,32 @@
 package ru.pl.astronomypictureoftheday.view.photolist
 
-import android.content.Context
 import android.os.Bundle
-import android.util.Log
 import android.view.*
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.view.MenuProvider
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
+import androidx.paging.LoadState
 import androidx.recyclerview.widget.GridLayoutManager
 import com.google.android.material.switchmaterial.SwitchMaterial
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.flow.conflate
-import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.launch
 import ru.pl.astronomypictureoftheday.R
 import ru.pl.astronomypictureoftheday.databinding.FragmentPhotoListBinding
-import ru.pl.astronomypictureoftheday.view.ViewModelFactory
-import ru.pl.astronomypictureoftheday.view.photolist.PhotoListViewModel.Companion.THEME_DARK
-import ru.pl.astronomypictureoftheday.view.photolist.PhotoListViewModel.Companion.THEME_LIGHT
+import ru.pl.astronomypictureoftheday.model.PreferencesRepository.Companion.THEME_DARK
+import ru.pl.astronomypictureoftheday.model.PreferencesRepository.Companion.THEME_LIGHT
+import ru.pl.astronomypictureoftheday.utils.setAppBarTitle
+import ru.pl.astronomypictureoftheday.view.adapters.PhotoListPagingAdapter
+import ru.pl.astronomypictureoftheday.view.adapters.PhotoLoadStateAdapter
+import kotlin.properties.Delegates
 
 private const val TAG = "PhotoListFragment";
-const val PREFS_NAME = "PREFS_NAME"
 
 class PhotoListFragment : Fragment() {
 
@@ -35,9 +36,8 @@ class PhotoListFragment : Fragment() {
             getString(R.string.binding_null_error)
         }
 
-    private val photoListViewModel: PhotoListViewModel by viewModels {
-        ViewModelFactory(requireActivity().getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE))
-    }
+    private val photoListViewModel: PhotoListViewModel by viewModels()
+    private var currentTheme by Delegates.notNull<Int>()
 
 /*    private val sharedPrefs by lazy {
         requireActivity().getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
@@ -55,6 +55,8 @@ class PhotoListFragment : Fragment() {
 
         binding.photoGrid.layoutManager = setUpLayoutManager()
 
+        setAppBarTitle(getString(R.string.app_name))
+
         return binding.root
     }
 
@@ -67,19 +69,51 @@ class PhotoListFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        binding.progressBar.visibility = View.VISIBLE
-
+        //state (currently contains ony theme)
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                photoListViewModel.topPhotos.collect { photoList ->
-                    binding.photoGrid.adapter = PhotoListAdapter(photoList.reversed()) {
-                        findNavController().navigate(PhotoListFragmentDirections.goToDetails(it))
-                    }
-                    if (photoList.isNotEmpty()) binding.progressBar.visibility = View.GONE
-                    Log.d(TAG, "loaded")
+                photoListViewModel.uiState.collect { state ->
+                    currentTheme = state.theme
+                    val themeMode =
+                        if (currentTheme == THEME_LIGHT)
+                            AppCompatDelegate.MODE_NIGHT_NO
+                        else
+                            AppCompatDelegate.MODE_NIGHT_YES
+                    AppCompatDelegate.setDefaultNightMode(themeMode)
                 }
             }
         }
+
+        //paging adapter
+        val pagingAdapter = PhotoListPagingAdapter {
+            findNavController().navigate(PhotoListFragmentDirections.goToDetails(it))
+        }
+        //footer progress + error msg + retry btn
+        binding.photoGrid.adapter = pagingAdapter.withLoadStateHeaderAndFooter(
+            header = PhotoLoadStateAdapter { pagingAdapter.retry() },
+            footer = PhotoLoadStateAdapter { pagingAdapter.retry() }
+        )
+
+        //paging collect data from viewModel
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                photoListViewModel.topPhotoItems.collectLatest {
+                    pagingAdapter.submitData(it)
+                }
+            }
+        }
+
+        //paging center retry button listener
+        binding.retryButton.setOnClickListener { pagingAdapter.retry() }
+
+        //paging center progress and btn visibility
+        viewLifecycleOwner.lifecycleScope.launch {
+            pagingAdapter.loadStateFlow.collect { loadState ->
+                binding.progressBar.isVisible = loadState.source.refresh is LoadState.Loading
+                binding.retryButton.isVisible = loadState.source.refresh is LoadState.Error
+            }
+        }
+
     }
 
 
@@ -103,13 +137,13 @@ class PhotoListFragment : Fragment() {
 
                 val switch: SwitchMaterial =
                     menu.findItem(R.id.enable_dark_mode).actionView.findViewById(R.id.switcher)
-                switch.isChecked = photoListViewModel.getSavedTheme() == THEME_DARK
+                switch.isChecked = currentTheme == THEME_DARK
 
                 switch.setOnCheckedChangeListener { _, isChecked ->
                     if (isChecked) {
-                        photoListViewModel.setTheme(AppCompatDelegate.MODE_NIGHT_YES, THEME_DARK)
+                        photoListViewModel.setTheme(THEME_DARK)
                     } else {
-                        photoListViewModel.setTheme(AppCompatDelegate.MODE_NIGHT_NO, THEME_LIGHT)
+                        photoListViewModel.setTheme(THEME_LIGHT)
                     }
                 }
             }

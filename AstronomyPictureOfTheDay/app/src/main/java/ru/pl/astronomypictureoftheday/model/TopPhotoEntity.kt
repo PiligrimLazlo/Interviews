@@ -1,4 +1,4 @@
-package ru.pl.astronomypictureoftheday.api
+package ru.pl.astronomypictureoftheday.model
 
 import android.os.Parcelable
 import com.squareup.moshi.Json
