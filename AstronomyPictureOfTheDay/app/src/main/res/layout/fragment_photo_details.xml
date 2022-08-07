@@ -20,29 +20,42 @@
             app:layout_constraintTop_toTopOf="parent"
             tools:src="@drawable/placeholder_400x400" />
 
-        <com.google.android.material.button.MaterialButton
+        <Button
             android:id="@+id/save_to_gallery_btn"
+            style="@style/main_button_style"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            style="@style/main_button_style"
-            android:text="@string/save_btn_text"
-            android:backgroundTint="@color/accent"
             android:layout_margin="16dp"
+            android:backgroundTint="@color/accent"
+            android:text="@string/save_btn_text"
             app:layout_constraintBottom_toBottomOf="@id/image_detail"
             app:layout_constraintEnd_toStartOf="@id/set_wallpapers_btn"
-            app:layout_constraintStart_toStartOf="parent"/>
+            app:layout_constraintStart_toStartOf="parent" />
 
-        <com.google.android.material.button.MaterialButton
+        <ProgressBar
+            android:id="@+id/progress_bar_save"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:indeterminateTint="@color/accent"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="@id/save_to_gallery_btn"
+            app:layout_constraintEnd_toEndOf="@id/save_to_gallery_btn"
+            app:layout_constraintStart_toStartOf="@id/save_to_gallery_btn"
+            app:layout_constraintTop_toTopOf="@id/save_to_gallery_btn"
+            tools:visibility="visible" />
+
+
+        <Button
             android:id="@+id/set_wallpapers_btn"
+            style="@style/main_button_style"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginEnd="16dp"
             android:layout_marginBottom="16dp"
-            style="@style/main_button_style"
             android:text="@string/set_wallpapers_btn_text"
             app:layout_constraintBottom_toBottomOf="@id/image_detail"
-            app:layout_constraintStart_toEndOf="@id/save_to_gallery_btn"
-            app:layout_constraintEnd_toEndOf="parent"/>
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/save_to_gallery_btn" />
 
 
         <TextView
@@ -61,10 +74,10 @@
         <TextView
             android:id="@+id/date_detail"
             style="@style/regular_text_view_style"
-            android:textStyle="normal"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="16dp"
+            android:textStyle="normal"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toBottomOf="@id/description_detail"
             tools:text="01.01.2023" />

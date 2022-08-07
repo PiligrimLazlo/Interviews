@@ -35,9 +35,9 @@
     </style>
 
     <style name="main_button_style">
-        <item name="backgroundTint">@color/main_background</item>
-        <item name="android:textColor">@color/main_color</item>
-        <item name="rippleColor">@color/main_color</item>
+        <item name="backgroundTint">@color/main_color</item>
+        <item name="android:textColor">@color/main_background</item>
+        <item name="rippleColor">@color/main_background</item>
     </style>
 
 

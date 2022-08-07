@@ -7,5 +7,5 @@
 
     <color name="main_color">@color/light_grey</color>
 
-    <color name="accent">@android:color/holo_orange_dark</color>
+    <color name="accent">@android:color/holo_blue_dark</color>
 </resources>

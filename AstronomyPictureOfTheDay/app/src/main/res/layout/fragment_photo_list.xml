@@ -23,12 +23,12 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        android:indeterminateTint="@color/main_color"
+        android:indeterminateTint="@color/accent"
         android:visibility="gone"
         tools:visibility="visible"
         />
 
-    <com.google.android.material.button.MaterialButton
+    <Button
         android:id="@+id/retry_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

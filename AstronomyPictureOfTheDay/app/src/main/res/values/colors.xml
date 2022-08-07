@@ -23,5 +23,5 @@
 
     <color name="main_color">@color/dark_grey</color>
 
-    <color name="accent">@android:color/holo_orange_light</color>
+    <color name="accent">@android:color/holo_blue_light</color>
 </resources>
