@@ -4,4 +4,6 @@
     <string name="dark_mode">Dark mode</string>
     <string name="binding_null_error">Cannot access binding because it is null. Is the view visible?</string>
     <string name="retry">Retry</string>
+    <string name="save_btn_text">Save</string>
+    <string name="set_wallpapers_btn_text">Set Wallpapers</string>
 </resources>

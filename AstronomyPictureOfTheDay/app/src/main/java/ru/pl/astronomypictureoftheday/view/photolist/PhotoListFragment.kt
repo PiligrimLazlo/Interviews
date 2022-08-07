@@ -39,10 +39,6 @@ class PhotoListFragment : Fragment() {
     private val photoListViewModel: PhotoListViewModel by viewModels()
     private var currentTheme by Delegates.notNull<Int>()
 
-/*    private val sharedPrefs by lazy {
-        requireActivity().getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
-    }*/
-
 
     override fun onCreateView(
         inflater: LayoutInflater,

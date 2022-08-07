@@ -6,4 +6,6 @@
     <color name="toolbar_color">@color/light_sky</color>
 
     <color name="main_color">@color/light_grey</color>
+
+    <color name="accent">@android:color/holo_orange_dark</color>
 </resources>

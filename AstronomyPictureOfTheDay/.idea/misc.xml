@@ -3,10 +3,11 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="..\:/Android Course/MyProjects/interviews/AstronomyPictureOfTheDay/app/src/main/res/drawable/main_button_bg.xml" value="0.134" />
         <entry key="..\:/Android Course/MyProjects/interviews/AstronomyPictureOfTheDay/app/src/main/res/layout-v26/fragment_photo_details.xml" value="0.22864583333333333" />
         <entry key="..\:/Android Course/MyProjects/interviews/AstronomyPictureOfTheDay/app/src/main/res/layout/activity_main.xml" value="0.2" />
         <entry key="..\:/Android Course/MyProjects/interviews/AstronomyPictureOfTheDay/app/src/main/res/layout/big_photo_list_item.xml" value="0.3647469458987784" />
-        <entry key="..\:/Android Course/MyProjects/interviews/AstronomyPictureOfTheDay/app/src/main/res/layout/fragment_photo_details.xml" value="0.2" />
+        <entry key="..\:/Android Course/MyProjects/interviews/AstronomyPictureOfTheDay/app/src/main/res/layout/fragment_photo_details.xml" value="0.3977485928705441" />
         <entry key="..\:/Android Course/MyProjects/interviews/AstronomyPictureOfTheDay/app/src/main/res/layout/fragment_photo_list.xml" value="0.1936978683966636" />
         <entry key="..\:/Android Course/MyProjects/interviews/AstronomyPictureOfTheDay/app/src/main/res/layout/photo_list_item.xml" value="0.264" />
         <entry key="..\:/Android Course/MyProjects/interviews/AstronomyPictureOfTheDay/app/src/main/res/layout/photos_load_state_footer.xml" value="0.4" />
