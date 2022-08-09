@@ -1,5 +1,6 @@
 package ru.pl.astronomypictureoftheday.utils
 
+import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
@@ -28,4 +29,8 @@ fun Fragment.showAlertDialog(title: String, message: String) {
         }
         .create()
         .show()
+}
+
+fun Fragment.toast(text: String) {
+    Toast.makeText(requireContext(), text, Toast.LENGTH_SHORT).show()
 }
