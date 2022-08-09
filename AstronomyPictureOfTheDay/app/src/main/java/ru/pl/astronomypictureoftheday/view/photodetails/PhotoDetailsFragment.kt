@@ -183,17 +183,20 @@ class PhotoDetailsFragment : Fragment() {
         val wallpaperHeight = Resources.getSystem().displayMetrics.heightPixels
         val wallpaperWidth = Resources.getSystem().displayMetrics.widthPixels
 
+        val widthFactor = wallpaperWidth.toDouble() / bitmap.width
+        val heightFactor = wallpaperHeight.toDouble() / bitmap.height
         //scale (grow) bitmap if it smaller than screen
-        if (bitmap.width < wallpaperWidth) {
-            val newBitmapHeight = bitmap.height * (wallpaperWidth.toDouble() / bitmap.width)
-            bitmap = bitmap.scale(wallpaperWidth, newBitmapHeight.toInt(), false)
+        //TODO chech it out
+        /*if (bitmap.width < wallpaperWidth && widthFactor > heightFactor) {
+            val newBitmapHeight = (bitmap.height * widthFactor).toInt()
+            bitmap = bitmap.scale(wallpaperWidth, newBitmapHeight, false)
         }
-        if (bitmap.height < wallpaperHeight) {
-            val newBitmapWidth = bitmap.width * (wallpaperHeight.toDouble() / bitmap.height)
-            bitmap = bitmap.scale(newBitmapWidth.toInt(), wallpaperHeight, false)
-        }
+        if (bitmap.height < wallpaperHeight && heightFactor > widthFactor) {
+            val newBitmapWidth = (bitmap.width * heightFactor).toInt()
+            bitmap = bitmap.scale(newBitmapWidth, wallpaperHeight, false)
+        }*/
 
-        //center cropping image
+        //center cropping big image
         val start = Point(0, 0)
         val end = Point(bitmap.width, bitmap.height)
 

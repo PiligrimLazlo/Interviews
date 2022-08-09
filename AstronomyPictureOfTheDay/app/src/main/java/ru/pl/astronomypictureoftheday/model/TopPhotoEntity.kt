@@ -12,5 +12,7 @@ data class TopPhotoEntity(
     val date: Date,
     val title: String,
     val explanation: String,
-    @Json(name = "url") val imageUrl: String
+    @Json(name = "url") val imageUrl: String,
+    //TODO add:
+    /*@Json(name = "hdurl") val imageHdUrl: String*/
 ) : Parcelable
