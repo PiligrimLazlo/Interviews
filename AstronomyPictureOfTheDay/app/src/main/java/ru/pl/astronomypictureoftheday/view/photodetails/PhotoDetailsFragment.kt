@@ -16,6 +16,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.appcompat.app.AlertDialog
 import androidx.core.graphics.scale
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -34,7 +35,6 @@ import ru.pl.astronomypictureoftheday.R
 import ru.pl.astronomypictureoftheday.databinding.FragmentPhotoDetailsBinding
 import ru.pl.astronomypictureoftheday.model.TopPhotoEntity
 import ru.pl.astronomypictureoftheday.utils.setAppBarTitle
-import ru.pl.astronomypictureoftheday.utils.showAlertDialog
 import ru.pl.astronomypictureoftheday.utils.toDefaultFormattedDate
 import ru.pl.astronomypictureoftheday.utils.toast
 import java.io.File
@@ -62,7 +62,7 @@ class PhotoDetailsFragment : Fragment() {
             lifecycleScope.launch {
                 //todo remove later
                 delay(2000)
-                val bitmap = getBitmapFromUrl(topPhotoEntity.imageUrl)
+                val bitmap = getBitmapFromUrl(topPhotoEntity.imageHdUrl)
                 bitmap?.let {
                     saveImageToInternalFolder(bitmap)
                 }
@@ -116,14 +116,14 @@ class PhotoDetailsFragment : Fragment() {
         }
 
         binding.setWallpapersBtn.setOnClickListener {
-            lifecycleScope.launch { setWallpaper(topPhotoEntity.imageUrl) }
+            changeSettingWallpapersState(true)
+            lifecycleScope.launch { setWallpaper(topPhotoEntity.imageHdUrl) }
         }
-
     }
 
     private fun requestWriteInMemoryPermission() {
         if (shouldShowRequestPermissionRationale(Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
-            showAlertDialog(
+            showRationaleDialog(
                 "Error",
                 "Write external storage permission did not received! (message from dialog)"
             )
@@ -132,6 +132,22 @@ class PhotoDetailsFragment : Fragment() {
         }
     }
 
+    private fun showRationaleDialog(title: String, message: String) {
+        AlertDialog.Builder(requireContext(), R.style.AlertDialogCustom)
+            .setMessage(message)
+            .setTitle(title)
+            .setCancelable(false)
+            .setPositiveButton(
+                "OK"
+            ) { dialog, _ ->
+                dialog.dismiss()
+            }
+            .create()
+            .show()
+    }
+
+    //todo вызывать этот метод при открытии фрагмента и сохранять битмап в поле,
+    // чтобы не ждать долго при нажатии кнопки save or setWallpapers
     private suspend fun getBitmapFromUrl(url: String): Bitmap? = withContext(Dispatchers.IO) {
         var bitmap: Bitmap? = null
         try {
@@ -153,7 +169,7 @@ class PhotoDetailsFragment : Fragment() {
             fileName
         )
         FileOutputStream(filePath).use {
-            bitmap.compress(Bitmap.CompressFormat.PNG, 100, it)
+            bitmap.compress(Bitmap.CompressFormat.PNG, 80, it)
         }
         requireActivity().runOnUiThread {
             toast("$filePath ${getString(R.string.successfully_saved_picture)}")
@@ -162,6 +178,7 @@ class PhotoDetailsFragment : Fragment() {
     }
 
     //todo вынести в состояние viewModel, при повороте логика ломается и не по ООПшному
+    //todo (сейчас выглядит неоч)
     private fun changeDownloadState(isDownloading: Boolean) {
         if (isDownloading) {
             binding.apply {
@@ -176,6 +193,23 @@ class PhotoDetailsFragment : Fragment() {
         }
     }
 
+    //todo вынести в состояние viewModel, при повороте логика ломается и не по ООПшному
+    //todo (сейчас выглядит неоч)
+    private fun changeSettingWallpapersState(isSettingWallpapers: Boolean) {
+        if (isSettingWallpapers) {
+            binding.apply {
+                setWallpapersBtn.visibility = View.INVISIBLE
+                progressBarWallpapers.visibility = View.VISIBLE
+            }
+        } else {
+            binding.apply {
+                setWallpapersBtn.visibility = View.VISIBLE
+                progressBarWallpapers.visibility = View.INVISIBLE
+            }
+        }
+    }
+
+    //todo add dialog with 3 choices: 1)homescreen 2)lockscreen 3)cancel
     private suspend fun setWallpaper(url: String) = withContext(Dispatchers.IO) {
         val wallpaperManager = WallpaperManager.getInstance(requireContext())
         var bitmap = getBitmapFromUrl(url) ?: throw IllegalArgumentException()
@@ -186,15 +220,15 @@ class PhotoDetailsFragment : Fragment() {
         val widthFactor = wallpaperWidth.toDouble() / bitmap.width
         val heightFactor = wallpaperHeight.toDouble() / bitmap.height
         //scale (grow) bitmap if it smaller than screen
-        //TODO chech it out
-        /*if (bitmap.width < wallpaperWidth && widthFactor > heightFactor) {
-            val newBitmapHeight = (bitmap.height * widthFactor).toInt()
-            bitmap = bitmap.scale(wallpaperWidth, newBitmapHeight, false)
+        if (bitmap.width < wallpaperWidth || bitmap.height < wallpaperHeight) {
+            if (widthFactor > heightFactor) {
+                val newBitmapHeight = (bitmap.height * widthFactor).toInt()
+                bitmap = bitmap.scale(wallpaperWidth, newBitmapHeight, false)
+            } else {
+                val newBitmapWidth = (bitmap.width * heightFactor).toInt()
+                bitmap = bitmap.scale(newBitmapWidth, wallpaperHeight, false)
+            }
         }
-        if (bitmap.height < wallpaperHeight && heightFactor > widthFactor) {
-            val newBitmapWidth = (bitmap.width * heightFactor).toInt()
-            bitmap = bitmap.scale(newBitmapWidth, wallpaperHeight, false)
-        }*/
 
         //center cropping big image
         val start = Point(0, 0)
@@ -211,7 +245,10 @@ class PhotoDetailsFragment : Fragment() {
 
         wallpaperManager.setBitmap(bitmap, Rect(start.x, start.y, end.x, end.y), false)
 
-        requireActivity().runOnUiThread { toast(getString(R.string.done)) }
+        requireActivity().runOnUiThread {
+            changeSettingWallpapersState(false)
+            toast(getString(R.string.done))
+        }
     }
 
 }

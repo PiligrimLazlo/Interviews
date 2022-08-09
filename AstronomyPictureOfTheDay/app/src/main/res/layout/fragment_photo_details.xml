@@ -57,6 +57,18 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@id/save_to_gallery_btn" />
 
+        <ProgressBar
+            android:id="@+id/progress_bar_wallpapers"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:indeterminateTint="@color/main_background"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="@id/set_wallpapers_btn"
+            app:layout_constraintEnd_toEndOf="@id/set_wallpapers_btn"
+            app:layout_constraintStart_toStartOf="@id/set_wallpapers_btn"
+            app:layout_constraintTop_toTopOf="@id/set_wallpapers_btn"
+            tools:visibility="visible" />
+
 
         <TextView
             android:id="@+id/description_detail"

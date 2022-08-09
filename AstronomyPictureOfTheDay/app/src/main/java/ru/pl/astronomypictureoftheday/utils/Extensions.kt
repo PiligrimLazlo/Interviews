@@ -17,20 +17,6 @@ fun Fragment.setAppBarTitle(title: String) {
     (activity as AppCompatActivity).supportActionBar?.title = title
 }
 
-fun Fragment.showAlertDialog(title: String, message: String) {
-    AlertDialog.Builder(requireContext(), R.style.AlertDialogCustom)
-        .setMessage(message)
-        .setTitle(title)
-        .setCancelable(false)
-        .setPositiveButton(
-            "OK"
-        ) { dialog, _ ->
-            dialog.dismiss()
-        }
-        .create()
-        .show()
-}
-
 fun Fragment.toast(text: String) {
     Toast.makeText(requireContext(), text, Toast.LENGTH_SHORT).show()
 }
