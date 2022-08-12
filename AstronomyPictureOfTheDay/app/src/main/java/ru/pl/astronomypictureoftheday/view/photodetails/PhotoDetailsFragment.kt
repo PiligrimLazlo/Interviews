@@ -3,24 +3,19 @@ package ru.pl.astronomypictureoftheday.view.photodetails
 import android.Manifest
 import android.annotation.SuppressLint
 import android.app.WallpaperManager
-import android.content.res.Resources
-import android.graphics.Bitmap
-import android.graphics.BitmapFactory
-import android.graphics.Point
-import android.graphics.Rect
 import android.graphics.drawable.Drawable
 import android.os.Bundle
-import android.os.Environment
 import android.text.Layout
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
-import androidx.core.graphics.scale
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.navArgs
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.DataSource
@@ -28,19 +23,13 @@ import com.bumptech.glide.load.engine.GlideException
 import com.bumptech.glide.request.RequestListener
 import com.bumptech.glide.request.target.Target
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import ru.pl.astronomypictureoftheday.R
 import ru.pl.astronomypictureoftheday.databinding.FragmentPhotoDetailsBinding
 import ru.pl.astronomypictureoftheday.model.TopPhotoEntity
 import ru.pl.astronomypictureoftheday.utils.setAppBarTitle
 import ru.pl.astronomypictureoftheday.utils.toDefaultFormattedDate
 import ru.pl.astronomypictureoftheday.utils.toast
-import java.io.File
-import java.io.FileOutputStream
-import java.lang.IllegalArgumentException
-import java.net.URL
 
 class PhotoDetailsFragment : Fragment() {
 
@@ -50,7 +39,7 @@ class PhotoDetailsFragment : Fragment() {
             getString(R.string.binding_null_error)
         }
 
-    private val viewModel: PhotoDetailsViewModel by viewModels()
+    private val photoDetailsViewModel: PhotoDetailsViewModel by viewModels()
     private val args: PhotoDetailsFragmentArgs by navArgs()
     private lateinit var topPhotoEntity: TopPhotoEntity
 
@@ -58,14 +47,9 @@ class PhotoDetailsFragment : Fragment() {
         ActivityResultContracts.RequestPermission()
     ) { permissionGranted ->
         if (permissionGranted) {
-            changeDownloadState(true)
-            lifecycleScope.launch {
-                //todo remove later
-                delay(2000)
-                val bitmap = getBitmapFromUrl(topPhotoEntity.imageHdUrl)
-                bitmap?.let {
-                    saveImageToInternalFolder(bitmap)
-                }
+            viewLifecycleOwner.lifecycleScope.launch {
+                photoDetailsViewModel.saveImageToInternalFolder(topPhotoEntity.imageHdUrl)
+                requireActivity().runOnUiThread { toast(getString(R.string.successfully_saved_picture)) }
             }
         }
     }
@@ -92,7 +76,7 @@ class PhotoDetailsFragment : Fragment() {
 
         topPhotoEntity = args.photoEntity
 
-        //photo load
+        //init photo and text load
         binding.apply {
             descriptionDetail.justificationMode = Layout.JUSTIFICATION_MODE_INTER_WORD
             descriptionDetail.text = topPhotoEntity.explanation
@@ -111,13 +95,20 @@ class PhotoDetailsFragment : Fragment() {
             dateDetail.text = topPhotoEntity.date.toDefaultFormattedDate()
         }
 
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                photoDetailsViewModel.details.collect { state ->
+                    updateUi(state)
+                }
+            }
+        }
+
         binding.saveToGalleryBtn.setOnClickListener {
             requestWriteInMemoryPermission()
         }
 
         binding.setWallpapersBtn.setOnClickListener {
-            changeSettingWallpapersState(true)
-            lifecycleScope.launch { setWallpaper(topPhotoEntity.imageHdUrl) }
+            setWallpaper(topPhotoEntity.imageHdUrl)
         }
     }
 
@@ -146,111 +137,34 @@ class PhotoDetailsFragment : Fragment() {
             .show()
     }
 
-    //todo вызывать этот метод при открытии фрагмента и сохранять битмап в поле,
-    // чтобы не ждать долго при нажатии кнопки save or setWallpapers
-    private suspend fun getBitmapFromUrl(url: String): Bitmap? = withContext(Dispatchers.IO) {
-        var bitmap: Bitmap? = null
-        try {
-            val urlEntity = URL(url)
-            val inputStream = urlEntity.openStream()
-            bitmap = BitmapFactory.decodeStream(inputStream)
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
-        return@withContext bitmap
-    }
-
-    private suspend fun saveImageToInternalFolder(bitmap: Bitmap) = withContext(Dispatchers.IO) {
-
-        val fileName = "NasaAPOD_" + System.currentTimeMillis() / 1000 + ".png"
-
-        val filePath = File(
-            Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES),
-            fileName
-        )
-        FileOutputStream(filePath).use {
-            bitmap.compress(Bitmap.CompressFormat.PNG, 80, it)
-        }
-        requireActivity().runOnUiThread {
-            toast("$filePath ${getString(R.string.successfully_saved_picture)}")
-            changeDownloadState(false)
+    private fun setWallpaper(url: String) {
+        viewLifecycleOwner.lifecycleScope.launch(Dispatchers.IO) {
+            val wallpaperManager = WallpaperManager.getInstance(requireContext())
+            val data = photoDetailsViewModel.getDataForWallpapers(url)
+            wallpaperManager.setBitmap(data.first, data.second, false)
+            photoDetailsViewModel.updateStateWallpapersSet()
+            requireActivity().runOnUiThread { toast(getString(R.string.wallpapers_set)) }
         }
     }
 
-    //todo вынести в состояние viewModel, при повороте логика ломается и не по ООПшному
-    //todo (сейчас выглядит неоч)
-    private fun changeDownloadState(isDownloading: Boolean) {
-        if (isDownloading) {
-            binding.apply {
+    private fun updateUi(state: PhotoDetailsState) {
+        binding.apply {
+            if (state.isSettingWallpaper) {
+                setWallpapersBtn.visibility = View.INVISIBLE
+                progressBarWallpapers.visibility = View.VISIBLE
+            } else {
+                setWallpapersBtn.visibility = View.VISIBLE
+                progressBarWallpapers.visibility = View.INVISIBLE
+            }
+            if (state.isSavingPhoto) {
                 saveToGalleryBtn.visibility = View.INVISIBLE
                 progressBarSave.visibility = View.VISIBLE
-            }
-        } else {
-            binding.apply {
+            } else {
                 saveToGalleryBtn.visibility = View.VISIBLE
                 progressBarSave.visibility = View.INVISIBLE
             }
         }
     }
-
-    //todo вынести в состояние viewModel, при повороте логика ломается и не по ООПшному
-    //todo (сейчас выглядит неоч)
-    private fun changeSettingWallpapersState(isSettingWallpapers: Boolean) {
-        if (isSettingWallpapers) {
-            binding.apply {
-                setWallpapersBtn.visibility = View.INVISIBLE
-                progressBarWallpapers.visibility = View.VISIBLE
-            }
-        } else {
-            binding.apply {
-                setWallpapersBtn.visibility = View.VISIBLE
-                progressBarWallpapers.visibility = View.INVISIBLE
-            }
-        }
-    }
-
-    //todo add dialog with 3 choices: 1)homescreen 2)lockscreen 3)cancel
-    private suspend fun setWallpaper(url: String) = withContext(Dispatchers.IO) {
-        val wallpaperManager = WallpaperManager.getInstance(requireContext())
-        var bitmap = getBitmapFromUrl(url) ?: throw IllegalArgumentException()
-
-        val wallpaperHeight = Resources.getSystem().displayMetrics.heightPixels
-        val wallpaperWidth = Resources.getSystem().displayMetrics.widthPixels
-
-        val widthFactor = wallpaperWidth.toDouble() / bitmap.width
-        val heightFactor = wallpaperHeight.toDouble() / bitmap.height
-        //scale (grow) bitmap if it smaller than screen
-        if (bitmap.width < wallpaperWidth || bitmap.height < wallpaperHeight) {
-            if (widthFactor > heightFactor) {
-                val newBitmapHeight = (bitmap.height * widthFactor).toInt()
-                bitmap = bitmap.scale(wallpaperWidth, newBitmapHeight, false)
-            } else {
-                val newBitmapWidth = (bitmap.width * heightFactor).toInt()
-                bitmap = bitmap.scale(newBitmapWidth, wallpaperHeight, false)
-            }
-        }
-
-        //center cropping big image
-        val start = Point(0, 0)
-        val end = Point(bitmap.width, bitmap.height)
-
-        if (bitmap.width > wallpaperWidth) {
-            start.x = (bitmap.width - wallpaperWidth) / 2
-            end.x = start.x + wallpaperWidth
-        }
-        if (bitmap.height > wallpaperHeight) {
-            start.y = (bitmap.height - wallpaperHeight) / 2
-            end.y = start.y + wallpaperHeight
-        }
-
-        wallpaperManager.setBitmap(bitmap, Rect(start.x, start.y, end.x, end.y), false)
-
-        requireActivity().runOnUiThread {
-            changeSettingWallpapersState(false)
-            toast(getString(R.string.done))
-        }
-    }
-
 }
 
 private class GlideRequestListener(private val callback: () -> Unit) : RequestListener<Drawable> {

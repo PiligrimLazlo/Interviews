@@ -6,7 +6,7 @@
     <string name="retry">Retry</string>
     <string name="save_btn_text">Save</string>
     <string name="set_wallpapers_btn_text">Set Wallpapers</string>
-    <string name="done">Done</string>
+    <string name="wallpapers_set">Wallpapers Set</string>
     <string name="successfully_saved_picture">"successfully saved in \"Pictures\" folder"</string>
 
 </resources>
