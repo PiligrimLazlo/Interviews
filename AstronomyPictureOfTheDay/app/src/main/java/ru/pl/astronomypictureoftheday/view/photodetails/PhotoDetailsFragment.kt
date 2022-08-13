@@ -137,6 +137,7 @@ class PhotoDetailsFragment : Fragment() {
             .show()
     }
 
+    //todo add dialog with 3 choices: 1)homescreen 2)lockscreen 3)cancel
     private fun setWallpaper(url: String) {
         viewLifecycleOwner.lifecycleScope.launch(Dispatchers.IO) {
             val wallpaperManager = WallpaperManager.getInstance(requireContext())

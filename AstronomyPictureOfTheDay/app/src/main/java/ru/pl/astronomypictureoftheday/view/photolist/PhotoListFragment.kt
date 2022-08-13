@@ -22,6 +22,7 @@ import ru.pl.astronomypictureoftheday.databinding.FragmentPhotoListBinding
 import ru.pl.astronomypictureoftheday.model.PreferencesRepository.Companion.THEME_DARK
 import ru.pl.astronomypictureoftheday.model.PreferencesRepository.Companion.THEME_LIGHT
 import ru.pl.astronomypictureoftheday.utils.setAppBarTitle
+import ru.pl.astronomypictureoftheday.utils.toast
 import ru.pl.astronomypictureoftheday.view.adapters.PhotoListPagingAdapter
 import ru.pl.astronomypictureoftheday.view.adapters.PhotoLoadStateAdapter
 import kotlin.properties.Delegates
@@ -81,9 +82,11 @@ class PhotoListFragment : Fragment() {
         }
 
         //paging adapter
-        val pagingAdapter = PhotoListPagingAdapter {
+        val pagingAdapter = PhotoListPagingAdapter({
             findNavController().navigate(PhotoListFragmentDirections.goToDetails(it))
-        }
+        }, {
+            toast("Save button pressed on photo ${it.title}")
+        })
         //footer progress + error msg + retry btn
         binding.photoGrid.adapter = pagingAdapter.withLoadStateHeaderAndFooter(
             header = PhotoLoadStateAdapter { pagingAdapter.retry() },

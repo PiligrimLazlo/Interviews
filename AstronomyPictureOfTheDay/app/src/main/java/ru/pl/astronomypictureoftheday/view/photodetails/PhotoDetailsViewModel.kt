@@ -47,8 +47,6 @@ class PhotoDetailsViewModel : ViewModel() {
         _detailsState.update { it.copy(isSavingPhoto = false) }
     }
 
-    //todo вызывать этот метод при открытии фрагмента и сохранять битмап в поле,
-    // чтобы не ждать долго при нажатии кнопки save or setWallpapers
     private suspend fun loadBitmapFromUrl(url: String): Bitmap? = withContext(Dispatchers.IO) {
         var bitmap: Bitmap? = null
         try {
@@ -61,15 +59,6 @@ class PhotoDetailsViewModel : ViewModel() {
         return@withContext bitmap
     }
 
-    private suspend fun saveImageToInternalFolder(bitmap: Bitmap) = withContext(Dispatchers.IO) {
-
-        /*requireActivity().runOnUiThread {
-            toast("$filePath ${getString(R.string.successfully_saved_picture)}")
-            changeDownloadState(false)
-        }*/
-    }
-
-    //todo add dialog with 3 choices: 1)homescreen 2)lockscreen 3)cancel
     suspend fun getDataForWallpapers(url: String): Pair<Bitmap, Rect> =
         withContext(Dispatchers.IO) {
             _detailsState.update { it.copy(isSettingWallpaper = true) }

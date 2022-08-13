@@ -2,6 +2,7 @@ package ru.pl.astronomypictureoftheday.view.adapters
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.core.content.ContextCompat
 import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
@@ -13,7 +14,8 @@ import ru.pl.astronomypictureoftheday.databinding.RegularPhotoListItemBinding
 import java.lang.IllegalArgumentException
 
 class PhotoListPagingAdapter(
-    private val onPhotoClickListener: (TopPhotoEntity) -> Unit
+    private val onPhotoClickListener: (TopPhotoEntity) -> Unit,
+    private val onSaveButtonPressedListener: (TopPhotoEntity) -> Unit,
 ) : PagingDataAdapter<TopPhotoEntity, RecyclerView.ViewHolder>(TopPhotoComparator) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
@@ -33,9 +35,9 @@ class PhotoListPagingAdapter(
         val photoItem = getItem(position)
         if (photoItem != null) {
             if (holder is RegularPhotoViewHolder)
-                holder.bind(photoItem, onPhotoClickListener)
+                holder.bind(photoItem, onPhotoClickListener, onSaveButtonPressedListener)
             else if (holder is BigPhotoViewHolder)
-                holder.bind(photoItem, onPhotoClickListener)
+                holder.bind(photoItem, onPhotoClickListener, onSaveButtonPressedListener)
         }
     }
 
@@ -60,9 +62,14 @@ object TopPhotoComparator : DiffUtil.ItemCallback<TopPhotoEntity>() {
 }
 
 
+//todo вынести повторный код в общего родителя
 class RegularPhotoViewHolder(private val binding: RegularPhotoListItemBinding) :
     RecyclerView.ViewHolder(binding.root) {
-    fun bind(topPhotoEntity: TopPhotoEntity, onPhotoClickListener: (TopPhotoEntity) -> Unit) {
+    fun bind(
+        topPhotoEntity: TopPhotoEntity,
+        onPhotoClickListener: (TopPhotoEntity) -> Unit,
+        onSaveButtonPressedListener: (TopPhotoEntity) -> Unit
+    ) {
         binding.topPhotoTv.text = topPhotoEntity.title
         Glide.with(binding.root.context)
             .load(topPhotoEntity.imageUrl)
@@ -73,12 +80,20 @@ class RegularPhotoViewHolder(private val binding: RegularPhotoListItemBinding) :
         binding.root.setOnClickListener {
             onPhotoClickListener(topPhotoEntity)
         }
+
+        binding.starBtn.setOnClickListener {
+            onSaveButtonPressedListener(topPhotoEntity)
+        }
     }
 }
 
 class BigPhotoViewHolder(private val binding: BigPhotoListItemBinding) :
     RecyclerView.ViewHolder(binding.root) {
-    fun bind(topPhotoEntity: TopPhotoEntity, onPhotoClickListener: (TopPhotoEntity) -> Unit) {
+    fun bind(
+        topPhotoEntity: TopPhotoEntity,
+        onPhotoClickListener: (TopPhotoEntity) -> Unit,
+        onSaveButtonPressedListener: (TopPhotoEntity) -> Unit
+    ) {
         binding.topPhotoTv.text = topPhotoEntity.title
         Glide.with(binding.root.context)
             .load(topPhotoEntity.imageUrl)
@@ -88,6 +103,10 @@ class BigPhotoViewHolder(private val binding: BigPhotoListItemBinding) :
 
         binding.root.setOnClickListener {
             onPhotoClickListener(topPhotoEntity)
+        }
+
+        binding.starBtn.setOnClickListener {
+            onSaveButtonPressedListener(topPhotoEntity)
         }
     }
 }
