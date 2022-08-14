@@ -2,21 +2,20 @@ package ru.pl.astronomypictureoftheday.view.adapters
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import androidx.core.content.ContextCompat
 import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import ru.pl.astronomypictureoftheday.R
-import ru.pl.astronomypictureoftheday.model.TopPhotoEntity
 import ru.pl.astronomypictureoftheday.databinding.BigPhotoListItemBinding
 import ru.pl.astronomypictureoftheday.databinding.RegularPhotoListItemBinding
+import ru.pl.astronomypictureoftheday.model.FavouritePhoto
 import java.lang.IllegalArgumentException
 
 class PhotoListPagingAdapter(
-    private val onPhotoClickListener: (TopPhotoEntity) -> Unit,
-    private val onSaveButtonPressedListener: (TopPhotoEntity) -> Unit,
-) : PagingDataAdapter<TopPhotoEntity, RecyclerView.ViewHolder>(TopPhotoComparator) {
+    private val onPhotoClickListener: (FavouritePhoto) -> Unit,
+    private val onSaveButtonPressedListener: (FavouritePhoto) -> Unit,
+) : PagingDataAdapter<FavouritePhoto, RecyclerView.ViewHolder>(TopPhotoComparator) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         val inflater = LayoutInflater.from(parent.context)
@@ -51,62 +50,86 @@ class PhotoListPagingAdapter(
     }
 }
 
-object TopPhotoComparator : DiffUtil.ItemCallback<TopPhotoEntity>() {
-    override fun areItemsTheSame(oldItem: TopPhotoEntity, newItem: TopPhotoEntity): Boolean {
+object TopPhotoComparator : DiffUtil.ItemCallback<FavouritePhoto>() {
+    override fun areItemsTheSame(oldItem: FavouritePhoto, newItem: FavouritePhoto): Boolean {
         return oldItem.title == newItem.title
     }
 
-    override fun areContentsTheSame(oldItem: TopPhotoEntity, newItem: TopPhotoEntity): Boolean {
+    override fun areContentsTheSame(oldItem: FavouritePhoto, newItem: FavouritePhoto): Boolean {
         return oldItem == newItem
     }
 }
 
 
-//todo вынести повторный код в общего родителя
+//todo вынести повторный код в общего родителя (но как)
 class RegularPhotoViewHolder(private val binding: RegularPhotoListItemBinding) :
     RecyclerView.ViewHolder(binding.root) {
     fun bind(
-        topPhotoEntity: TopPhotoEntity,
-        onPhotoClickListener: (TopPhotoEntity) -> Unit,
-        onSaveButtonPressedListener: (TopPhotoEntity) -> Unit
+        favouritePhoto: FavouritePhoto,
+        onPhotoClickListener: (FavouritePhoto) -> Unit,
+        onSaveButtonPressedListener: (FavouritePhoto) -> Unit
     ) {
-        binding.topPhotoTv.text = topPhotoEntity.title
+        binding.topPhotoTv.text = favouritePhoto.title
         Glide.with(binding.root.context)
-            .load(topPhotoEntity.imageUrl)
+            .load(favouritePhoto.imageUrl)
             .placeholder(R.drawable.placeholder_200x200)
             .error(R.drawable.error_200x200)
             .into(binding.topPhotoImage)
 
         binding.root.setOnClickListener {
-            onPhotoClickListener(topPhotoEntity)
+            onPhotoClickListener(favouritePhoto)
         }
 
         binding.starBtn.setOnClickListener {
-            onSaveButtonPressedListener(topPhotoEntity)
+            favouritePhoto.isFavourite = !favouritePhoto.isFavourite
+            updateColor(favouritePhoto.isFavourite)
+
+            onSaveButtonPressedListener(favouritePhoto)
         }
+
+        updateColor(favouritePhoto.isFavourite)
+    }
+
+    private fun updateColor(isFavourite: Boolean) {
+        binding.starBtn.background.setTint(
+            if (isFavourite) binding.root.context.getColor(R.color.accent)
+            else binding.root.context.getColor(R.color.white)
+        )
     }
 }
 
 class BigPhotoViewHolder(private val binding: BigPhotoListItemBinding) :
     RecyclerView.ViewHolder(binding.root) {
     fun bind(
-        topPhotoEntity: TopPhotoEntity,
-        onPhotoClickListener: (TopPhotoEntity) -> Unit,
-        onSaveButtonPressedListener: (TopPhotoEntity) -> Unit
+        favouritePhoto: FavouritePhoto,
+        onPhotoClickListener: (FavouritePhoto) -> Unit,
+        onSaveButtonPressedListener: (FavouritePhoto) -> Unit
     ) {
-        binding.topPhotoTv.text = topPhotoEntity.title
+        binding.topPhotoTv.text = favouritePhoto.title
         Glide.with(binding.root.context)
-            .load(topPhotoEntity.imageUrl)
+            .load(favouritePhoto.imageUrl)
             .placeholder(R.drawable.placeholder_400x400)
             .error(R.drawable.error_400x400)
             .into(binding.topPhotoImage)
 
         binding.root.setOnClickListener {
-            onPhotoClickListener(topPhotoEntity)
+            onPhotoClickListener(favouritePhoto)
         }
 
         binding.starBtn.setOnClickListener {
-            onSaveButtonPressedListener(topPhotoEntity)
+            favouritePhoto.isFavourite = !favouritePhoto.isFavourite
+
+            onSaveButtonPressedListener(favouritePhoto)
+            updateColor(favouritePhoto.isFavourite)
         }
+
+        updateColor(favouritePhoto.isFavourite)
+    }
+
+    private fun updateColor(isFavourite: Boolean) {
+        binding.starBtn.background.setTint(
+            if (isFavourite) binding.root.context.getColor(R.color.accent)
+            else binding.root.context.getColor(R.color.white)
+        )
     }
 }

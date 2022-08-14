@@ -8,8 +8,8 @@
         android:name="ru.pl.astronomypictureoftheday.view.photodetails.PhotoDetailsFragment"
         android:label="PhotoDetailsFragment" >
         <argument
-            android:name="photoEntity"
-            app:argType="ru.pl.astronomypictureoftheday.model.TopPhotoEntity" />
+            android:name="favouritePhoto"
+            app:argType="ru.pl.astronomypictureoftheday.model.FavouritePhoto" />
     </fragment>
     <fragment
         android:id="@+id/photoListFragment2"

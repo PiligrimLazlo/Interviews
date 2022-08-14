@@ -14,7 +14,6 @@ import androidx.navigation.fragment.findNavController
 import androidx.paging.LoadState
 import androidx.recyclerview.widget.GridLayoutManager
 import com.google.android.material.switchmaterial.SwitchMaterial
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import ru.pl.astronomypictureoftheday.R
@@ -85,7 +84,8 @@ class PhotoListFragment : Fragment() {
         val pagingAdapter = PhotoListPagingAdapter({
             findNavController().navigate(PhotoListFragmentDirections.goToDetails(it))
         }, {
-            toast("Save button pressed on photo ${it.title}")
+            toast("\"${it.title}\" ${getString(R.string.added_to_favourites)}")
+            photoListViewModel.onSaveFavouriteButtonPressed(it)
         })
         //footer progress + error msg + retry btn
         binding.photoGrid.adapter = pagingAdapter.withLoadStateHeaderAndFooter(
@@ -96,7 +96,7 @@ class PhotoListFragment : Fragment() {
         //paging collect data from viewModel
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                photoListViewModel.topPhotoItems.collectLatest {
+                photoListViewModel.favouritePhotoItemsFromPaging.collectLatest {
                     pagingAdapter.submitData(it)
                 }
             }

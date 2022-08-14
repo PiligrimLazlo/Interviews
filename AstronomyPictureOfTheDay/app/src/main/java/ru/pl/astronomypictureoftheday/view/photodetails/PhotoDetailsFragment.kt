@@ -26,7 +26,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import ru.pl.astronomypictureoftheday.R
 import ru.pl.astronomypictureoftheday.databinding.FragmentPhotoDetailsBinding
-import ru.pl.astronomypictureoftheday.model.TopPhotoEntity
+import ru.pl.astronomypictureoftheday.model.FavouritePhoto
 import ru.pl.astronomypictureoftheday.utils.setAppBarTitle
 import ru.pl.astronomypictureoftheday.utils.toDefaultFormattedDate
 import ru.pl.astronomypictureoftheday.utils.toast
@@ -41,14 +41,14 @@ class PhotoDetailsFragment : Fragment() {
 
     private val photoDetailsViewModel: PhotoDetailsViewModel by viewModels()
     private val args: PhotoDetailsFragmentArgs by navArgs()
-    private lateinit var topPhotoEntity: TopPhotoEntity
+    private lateinit var favouritePhoto: FavouritePhoto
 
     private val requestWriteInMemoryPermissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestPermission()
     ) { permissionGranted ->
         if (permissionGranted) {
             viewLifecycleOwner.lifecycleScope.launch {
-                photoDetailsViewModel.saveImageToInternalFolder(topPhotoEntity.imageHdUrl)
+                photoDetailsViewModel.saveImageToInternalFolder(favouritePhoto.imageHdUrl, favouritePhoto.title)
                 requireActivity().runOnUiThread { toast(getString(R.string.successfully_saved_picture)) }
             }
         }
@@ -74,14 +74,14 @@ class PhotoDetailsFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        topPhotoEntity = args.photoEntity
+        favouritePhoto = args.favouritePhoto
 
         //init photo and text load
         binding.apply {
             descriptionDetail.justificationMode = Layout.JUSTIFICATION_MODE_INTER_WORD
-            descriptionDetail.text = topPhotoEntity.explanation
+            descriptionDetail.text = favouritePhoto.explanation
             Glide.with(root.context)
-                .load(topPhotoEntity.imageUrl)
+                .load(favouritePhoto.imageUrl)
                 .placeholder(R.drawable.placeholder_400x400)
                 .error(R.drawable.error_400x400)
                 .listener(GlideRequestListener {
@@ -90,9 +90,9 @@ class PhotoDetailsFragment : Fragment() {
                 })
                 .into(imageDetail)
 
-            setAppBarTitle(topPhotoEntity.title)
+            setAppBarTitle(favouritePhoto.title)
 
-            dateDetail.text = topPhotoEntity.date.toDefaultFormattedDate()
+            dateDetail.text = favouritePhoto.date.toDefaultFormattedDate()
         }
 
         viewLifecycleOwner.lifecycleScope.launch {
@@ -108,7 +108,7 @@ class PhotoDetailsFragment : Fragment() {
         }
 
         binding.setWallpapersBtn.setOnClickListener {
-            setWallpaper(topPhotoEntity.imageHdUrl)
+            setWallpaper(favouritePhoto.imageHdUrl)
         }
     }
 
@@ -163,6 +163,10 @@ class PhotoDetailsFragment : Fragment() {
             } else {
                 saveToGalleryBtn.visibility = View.VISIBLE
                 progressBarSave.visibility = View.INVISIBLE
+            }
+            if (state.pictureFullPathName.isNotBlank()) {
+                saveToGalleryBtn.isEnabled = false
+                saveToGalleryBtn.text = getString(R.string.picture_saved)
             }
         }
     }

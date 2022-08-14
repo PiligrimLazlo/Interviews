@@ -4,9 +4,10 @@
     <string name="dark_mode">Dark mode</string>
     <string name="binding_null_error">Cannot access binding because it is null. Is the view visible?</string>
     <string name="retry">Retry</string>
-    <string name="save_btn_text">Save Image</string>
+    <string name="save_btn_text">Save To Gallery</string>
     <string name="set_wallpapers_btn_text">Set Wallpapers</string>
     <string name="wallpapers_set">Wallpapers Set</string>
     <string name="successfully_saved_picture">"successfully saved in \"Pictures\" folder"</string>
-
+    <string name="picture_saved">Picture saved</string>
+    <string name="added_to_favourites">added to favourites</string>
 </resources>

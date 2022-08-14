@@ -6,6 +6,7 @@ import android.graphics.BitmapFactory
 import android.graphics.Point
 import android.graphics.Rect
 import android.os.Environment
+import android.util.Log
 import androidx.core.graphics.scale
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -22,6 +23,8 @@ import java.io.FileOutputStream
 import java.lang.IllegalArgumentException
 import java.net.URL
 
+private const val TAG = "PhotoDetailsViewModel"
+
 class PhotoDetailsViewModel : ViewModel() {
     private val _detailsState: MutableStateFlow<PhotoDetailsState> =
         MutableStateFlow(PhotoDetailsState())
@@ -29,23 +32,33 @@ class PhotoDetailsViewModel : ViewModel() {
         get() = _detailsState.asStateFlow()
     private lateinit var bitmap: Bitmap
 
+    //todo Room repository
 
-    suspend fun saveImageToInternalFolder(url: String) = withContext(Dispatchers.IO) {
-        _detailsState.update { it.copy(isSavingPhoto = true) }
-        if (!::bitmap.isInitialized) {
-            bitmap = loadBitmapFromUrl(url) ?: throw IllegalArgumentException()
-        }
 
-        val fileName = "NasaAPOD_" + System.currentTimeMillis() / 1000 + ".png"
-        val filePath = File(
-            Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES),
-            fileName
-        )
-        FileOutputStream(filePath).use {
-            bitmap.compress(Bitmap.CompressFormat.PNG, 80, it)
+    suspend fun saveImageToInternalFolder(url: String, title: String) =
+        withContext(Dispatchers.IO) {
+            _detailsState.update { it.copy(isSavingPhoto = true) }
+
+            val fileName = "NasaAPOD_$title.png"
+            val filePath = File(
+                Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES),
+                fileName
+            )
+            _detailsState.update { it.copy(pictureFullPathName = filePath.absolutePath) }
+            Log.d(TAG, filePath.absolutePath)
+
+            if (filePath.exists()) {
+                bitmap = BitmapFactory.decodeFile(details.value.pictureFullPathName)
+            } else if (!::bitmap.isInitialized) {
+                bitmap = loadBitmapFromUrl(url) ?: throw IllegalArgumentException()
+            }
+
+            if (!filePath.exists())
+                FileOutputStream(filePath).use {
+                    bitmap.compress(Bitmap.CompressFormat.PNG, 80, it)
+                }
+            _detailsState.update { it.copy(isSavingPhoto = false) }
         }
-        _detailsState.update { it.copy(isSavingPhoto = false) }
-    }
 
     private suspend fun loadBitmapFromUrl(url: String): Bitmap? = withContext(Dispatchers.IO) {
         var bitmap: Bitmap? = null
@@ -62,9 +75,11 @@ class PhotoDetailsViewModel : ViewModel() {
     suspend fun getDataForWallpapers(url: String): Pair<Bitmap, Rect> =
         withContext(Dispatchers.IO) {
             _detailsState.update { it.copy(isSettingWallpaper = true) }
-
-            if (!::bitmap.isInitialized)
+            if (details.value.pictureFullPathName.isNotBlank()) {
+                bitmap = BitmapFactory.decodeFile(details.value.pictureFullPathName)
+            } else if (!::bitmap.isInitialized) {
                 bitmap = loadBitmapFromUrl(url) ?: throw IllegalArgumentException()
+            }
 
             val wallpaperHeight = Resources.getSystem().displayMetrics.heightPixels
             val wallpaperWidth = Resources.getSystem().displayMetrics.widthPixels
@@ -93,10 +108,6 @@ class PhotoDetailsViewModel : ViewModel() {
                 start.y = (bitmap.height - wallpaperHeight) / 2
                 end.y = start.y + wallpaperHeight
             }
-            /*requireActivity().runOnUiThread {
-                changeSettingWallpapersState(false)
-                toast(getString(R.string.done))
-            }*/
             return@withContext Pair(bitmap, Rect(start.x, start.y, end.x, end.y))
         }
 
@@ -108,5 +119,6 @@ class PhotoDetailsViewModel : ViewModel() {
 
 data class PhotoDetailsState(
     val isSavingPhoto: Boolean = false,
-    val isSettingWallpaper: Boolean = false
+    val isSettingWallpaper: Boolean = false,
+    val pictureFullPathName: String = ""
 )

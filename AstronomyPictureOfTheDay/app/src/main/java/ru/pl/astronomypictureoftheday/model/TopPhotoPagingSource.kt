@@ -4,38 +4,40 @@ import android.util.Log
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
 import ru.pl.astronomypictureoftheday.model.api.TopPhotoApi
+import ru.pl.astronomypictureoftheday.model.room.FavouritePhotoRepository
 import ru.pl.astronomypictureoftheday.utils.SERVER_DATE_FORMAT
-import java.text.SimpleDateFormat
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.time.temporal.ChronoUnit
-import java.util.*
 
 private const val TAG = "TopPhotoPagingSource"
 
 class TopPhotoPagingSource(
     private val topPhotoApi: TopPhotoApi
-) : PagingSource<Int, TopPhotoEntity>() {
-    override suspend fun load(params: LoadParams<Int>): LoadResult<Int, TopPhotoEntity> {
+) : PagingSource<Int, TopPhotoResponse>() {
+    override suspend fun load(params: LoadParams<Int>): LoadResult<Int, TopPhotoResponse> {
         return try {
             val pageIndex = params.key ?: 1
 
             val period = getPeriod(params.loadSize, pageIndex)
-            val topPhotoList: List<TopPhotoEntity> =
-                topPhotoApi.fetchTopPhotos(period.first, period.second).reversed()
+            //переводит TopPhotoResponse в FavouritePhoto,
+            // далее если есть запись в БД, заменяем в списке
+            val favouritePhotoList: List<TopPhotoResponse> = topPhotoApi
+                .fetchTopPhotos(period.first, period.second)
+                .reversed()
             Log.d(TAG, "${period.first} : ${period.second} -> pageIndex: $pageIndex")
-            Log.d(TAG, "photosListSize: ${topPhotoList.size}")
+            Log.d(TAG, "photosListSize: ${favouritePhotoList.size}")
 
             val prev = if (pageIndex == 1) null else pageIndex - 1
-            val next = if (topPhotoList.size == params.loadSize) pageIndex + 1 else null
+            val next = if (favouritePhotoList.size == params.loadSize) pageIndex + 1 else null
 
-            LoadResult.Page(topPhotoList, prev, next)
+            LoadResult.Page(favouritePhotoList, prev, next)
         } catch (e: Exception) {
             LoadResult.Error(e)
         }
     }
 
-    override fun getRefreshKey(state: PagingState<Int, TopPhotoEntity>): Int? {
+    override fun getRefreshKey(state: PagingState<Int, TopPhotoResponse>): Int? {
         // get the most recently accessed index in the users list:
         val anchorPosition = state.anchorPosition ?: return null
         // convert item index to page index:
