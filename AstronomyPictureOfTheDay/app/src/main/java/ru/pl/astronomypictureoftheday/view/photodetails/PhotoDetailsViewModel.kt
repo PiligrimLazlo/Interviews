@@ -5,19 +5,16 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Point
 import android.graphics.Rect
-import android.os.Environment
 import android.util.Log
 import androidx.core.graphics.scale
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import ru.pl.astronomypictureoftheday.utils.ImageManager
 import java.io.File
 import java.io.FileOutputStream
 import java.lang.IllegalArgumentException
@@ -35,30 +32,24 @@ class PhotoDetailsViewModel : ViewModel() {
     //todo Room repository
 
 
-    suspend fun saveImageToInternalFolder(url: String, title: String) =
-        withContext(Dispatchers.IO) {
-            _detailsState.update { it.copy(isSavingPhoto = true) }
+    suspend fun saveImageToInternalFolder(url: String, title: String) {
+        _detailsState.update { it.copy(isSavingPhoto = true) }
 
-            val fileName = "NasaAPOD_$title.png"
-            val filePath = File(
-                Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES),
-                fileName
-            )
-            _detailsState.update { it.copy(pictureFullPathName = filePath.absolutePath) }
-            Log.d(TAG, filePath.absolutePath)
+        val filePath = ImageManager.getImageFullPathFile(title)
+        Log.d(TAG, filePath.absolutePath)
 
-            if (filePath.exists()) {
-                bitmap = BitmapFactory.decodeFile(details.value.pictureFullPathName)
-            } else if (!::bitmap.isInitialized) {
-                bitmap = loadBitmapFromUrl(url) ?: throw IllegalArgumentException()
-            }
-
-            if (!filePath.exists())
-                FileOutputStream(filePath).use {
-                    bitmap.compress(Bitmap.CompressFormat.PNG, 80, it)
-                }
-            _detailsState.update { it.copy(isSavingPhoto = false) }
+        if (filePath.exists() && !::bitmap.isInitialized) {
+            bitmap = BitmapFactory.decodeFile(filePath.absolutePath)
+        } else if (!::bitmap.isInitialized) {
+            bitmap = loadBitmapFromUrl(url) ?: throw IllegalArgumentException()
         }
+
+        if (!filePath.exists())
+            FileOutputStream(filePath).use {
+                bitmap.compress(Bitmap.CompressFormat.PNG, 80, it)
+            }
+        _detailsState.update { it.copy(isSavingPhoto = false) }
+    }
 
     private suspend fun loadBitmapFromUrl(url: String): Bitmap? = withContext(Dispatchers.IO) {
         var bitmap: Bitmap? = null
@@ -72,11 +63,12 @@ class PhotoDetailsViewModel : ViewModel() {
         return@withContext bitmap
     }
 
-    suspend fun getDataForWallpapers(url: String): Pair<Bitmap, Rect> =
+    suspend fun getDataForWallpapers(url: String, title: String): Pair<Bitmap, Rect> =
         withContext(Dispatchers.IO) {
             _detailsState.update { it.copy(isSettingWallpaper = true) }
-            if (details.value.pictureFullPathName.isNotBlank()) {
-                bitmap = BitmapFactory.decodeFile(details.value.pictureFullPathName)
+            val filePath = ImageManager.getImageFullPathFile(title)
+            if (filePath.exists() && !::bitmap.isInitialized) {
+                bitmap = BitmapFactory.decodeFile(filePath.absolutePath)
             } else if (!::bitmap.isInitialized) {
                 bitmap = loadBitmapFromUrl(url) ?: throw IllegalArgumentException()
             }
@@ -120,5 +112,4 @@ class PhotoDetailsViewModel : ViewModel() {
 data class PhotoDetailsState(
     val isSavingPhoto: Boolean = false,
     val isSettingWallpaper: Boolean = false,
-    val pictureFullPathName: String = ""
 )

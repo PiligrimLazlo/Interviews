@@ -4,7 +4,7 @@ import android.util.Log
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
 import ru.pl.astronomypictureoftheday.model.api.TopPhotoApi
-import ru.pl.astronomypictureoftheday.model.room.FavouritePhotoRepository
+import ru.pl.astronomypictureoftheday.model.api.TopPhotoResponse
 import ru.pl.astronomypictureoftheday.utils.SERVER_DATE_FORMAT
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter

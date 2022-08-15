@@ -1,11 +1,10 @@
-package ru.pl.astronomypictureoftheday.model.room
+package ru.pl.astronomypictureoftheday.model.repositories
 
 import android.content.Context
 import androidx.room.Room
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.launch
 import ru.pl.astronomypictureoftheday.model.FavouritePhoto
-import java.util.*
+import ru.pl.astronomypictureoftheday.model.room.FavouritePhotoDatabase
 
 class FavouritePhotoRepository private constructor(context: Context) {
 

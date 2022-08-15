@@ -1,4 +1,4 @@
-package ru.pl.astronomypictureoftheday.model
+package ru.pl.astronomypictureoftheday.model.repositories
 
 import android.content.Context
 import androidx.datastore.core.DataStore

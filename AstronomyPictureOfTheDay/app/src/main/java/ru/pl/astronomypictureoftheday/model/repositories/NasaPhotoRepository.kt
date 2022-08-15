@@ -1,4 +1,4 @@
-package ru.pl.astronomypictureoftheday.model.api
+package ru.pl.astronomypictureoftheday.model.repositories
 
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
@@ -13,9 +13,8 @@ import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
 import retrofit2.create
 import ru.pl.astronomypictureoftheday.model.FavouritePhoto
-import ru.pl.astronomypictureoftheday.model.TopPhotoResponse
 import ru.pl.astronomypictureoftheday.model.TopPhotoPagingSource
-import ru.pl.astronomypictureoftheday.model.room.FavouritePhotoRepository
+import ru.pl.astronomypictureoftheday.model.api.TopPhotoApi
 import ru.pl.astronomypictureoftheday.utils.JsonDateAdapter
 
 class NasaPhotoRepository {

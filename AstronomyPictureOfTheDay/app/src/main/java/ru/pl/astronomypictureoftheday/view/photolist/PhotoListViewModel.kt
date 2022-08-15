@@ -9,11 +9,12 @@ import androidx.paging.map
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
-import ru.pl.astronomypictureoftheday.model.PreferencesRepository
-import ru.pl.astronomypictureoftheday.model.PreferencesRepository.Companion.THEME_LIGHT
+import ru.pl.astronomypictureoftheday.model.repositories.PreferencesRepository
+import ru.pl.astronomypictureoftheday.model.repositories.PreferencesRepository.Companion.THEME_LIGHT
 import ru.pl.astronomypictureoftheday.model.FavouritePhoto
-import ru.pl.astronomypictureoftheday.model.api.NasaPhotoRepository
-import ru.pl.astronomypictureoftheday.model.room.FavouritePhotoRepository
+import ru.pl.astronomypictureoftheday.model.repositories.NasaPhotoRepository
+import ru.pl.astronomypictureoftheday.model.repositories.FavouritePhotoRepository
+import ru.pl.astronomypictureoftheday.utils.ImageManager
 
 private const val TAG = "PhotoListViewModel";
 
@@ -28,7 +29,6 @@ class PhotoListViewModel : ViewModel() {
         get() = _uiState.asStateFlow()
 
     val favouritePhotoItemsFromPaging: Flow<PagingData<FavouritePhoto>>
-    //val favouritePhotoItemsFromDb: Flow<List<FavouritePhoto>>
 
     init {
         viewModelScope.launch {
@@ -81,7 +81,8 @@ class PhotoListViewModel : ViewModel() {
                 dbPhotoRepository.addFavouritePhoto(
                     favouritePhoto.copy(
                         isFavourite = true,
-                        localPhotoPath = ""
+                        localPhotoPath =
+                        ImageManager.getImageFullPathFile(favouritePhoto.title).absolutePath
                     )
                 )
             } else {

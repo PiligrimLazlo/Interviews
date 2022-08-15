@@ -1,7 +1,8 @@
-package ru.pl.astronomypictureoftheday.model
+package ru.pl.astronomypictureoftheday.model.api
 
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
+import ru.pl.astronomypictureoftheday.model.FavouritePhoto
 import java.util.*
 
 @JsonClass(generateAdapter = true)

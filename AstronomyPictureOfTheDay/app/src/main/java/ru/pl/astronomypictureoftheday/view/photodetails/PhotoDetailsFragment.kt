@@ -3,6 +3,8 @@ package ru.pl.astronomypictureoftheday.view.photodetails
 import android.Manifest
 import android.annotation.SuppressLint
 import android.app.WallpaperManager
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.text.Layout
@@ -27,6 +29,7 @@ import kotlinx.coroutines.launch
 import ru.pl.astronomypictureoftheday.R
 import ru.pl.astronomypictureoftheday.databinding.FragmentPhotoDetailsBinding
 import ru.pl.astronomypictureoftheday.model.FavouritePhoto
+import ru.pl.astronomypictureoftheday.utils.ImageManager
 import ru.pl.astronomypictureoftheday.utils.setAppBarTitle
 import ru.pl.astronomypictureoftheday.utils.toDefaultFormattedDate
 import ru.pl.astronomypictureoftheday.utils.toast
@@ -48,7 +51,10 @@ class PhotoDetailsFragment : Fragment() {
     ) { permissionGranted ->
         if (permissionGranted) {
             viewLifecycleOwner.lifecycleScope.launch {
-                photoDetailsViewModel.saveImageToInternalFolder(favouritePhoto.imageHdUrl, favouritePhoto.title)
+                photoDetailsViewModel.saveImageToInternalFolder(
+                    favouritePhoto.imageHdUrl,
+                    favouritePhoto.title
+                )
                 requireActivity().runOnUiThread { toast(getString(R.string.successfully_saved_picture)) }
             }
         }
@@ -80,8 +86,15 @@ class PhotoDetailsFragment : Fragment() {
         binding.apply {
             descriptionDetail.justificationMode = Layout.JUSTIFICATION_MODE_INTER_WORD
             descriptionDetail.text = favouritePhoto.explanation
+
+            val filePath = ImageManager.getImageFullPathFile(favouritePhoto.title)
             Glide.with(root.context)
-                .load(favouritePhoto.imageUrl)
+                .load(
+                    if (filePath.exists())
+                        BitmapFactory.decodeFile(filePath.absolutePath)
+                    else
+                        favouritePhoto.imageUrl
+                )
                 .placeholder(R.drawable.placeholder_400x400)
                 .error(R.drawable.error_400x400)
                 .listener(GlideRequestListener {
@@ -89,6 +102,7 @@ class PhotoDetailsFragment : Fragment() {
                     setWallpapersBtn.isEnabled = false
                 })
                 .into(imageDetail)
+
 
             setAppBarTitle(favouritePhoto.title)
 
@@ -108,7 +122,7 @@ class PhotoDetailsFragment : Fragment() {
         }
 
         binding.setWallpapersBtn.setOnClickListener {
-            setWallpaper(favouritePhoto.imageHdUrl)
+            setWallpaper(favouritePhoto.imageHdUrl, favouritePhoto.title)
         }
     }
 
@@ -138,10 +152,10 @@ class PhotoDetailsFragment : Fragment() {
     }
 
     //todo add dialog with 3 choices: 1)homescreen 2)lockscreen 3)cancel
-    private fun setWallpaper(url: String) {
+    private fun setWallpaper(url: String, title: String) {
         viewLifecycleOwner.lifecycleScope.launch(Dispatchers.IO) {
             val wallpaperManager = WallpaperManager.getInstance(requireContext())
-            val data = photoDetailsViewModel.getDataForWallpapers(url)
+            val data = photoDetailsViewModel.getDataForWallpapers(url, title)
             wallpaperManager.setBitmap(data.first, data.second, false)
             photoDetailsViewModel.updateStateWallpapersSet()
             requireActivity().runOnUiThread { toast(getString(R.string.wallpapers_set)) }
@@ -163,10 +177,6 @@ class PhotoDetailsFragment : Fragment() {
             } else {
                 saveToGalleryBtn.visibility = View.VISIBLE
                 progressBarSave.visibility = View.INVISIBLE
-            }
-            if (state.pictureFullPathName.isNotBlank()) {
-                saveToGalleryBtn.isEnabled = false
-                saveToGalleryBtn.text = getString(R.string.picture_saved)
             }
         }
     }

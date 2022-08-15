@@ -1,6 +1,7 @@
 package ru.pl.astronomypictureoftheday.view.photolist
 
 import android.os.Bundle
+import android.util.Log
 import android.view.*
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.view.MenuProvider
@@ -18,8 +19,8 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import ru.pl.astronomypictureoftheday.R
 import ru.pl.astronomypictureoftheday.databinding.FragmentPhotoListBinding
-import ru.pl.astronomypictureoftheday.model.PreferencesRepository.Companion.THEME_DARK
-import ru.pl.astronomypictureoftheday.model.PreferencesRepository.Companion.THEME_LIGHT
+import ru.pl.astronomypictureoftheday.model.repositories.PreferencesRepository.Companion.THEME_DARK
+import ru.pl.astronomypictureoftheday.model.repositories.PreferencesRepository.Companion.THEME_LIGHT
 import ru.pl.astronomypictureoftheday.utils.setAppBarTitle
 import ru.pl.astronomypictureoftheday.utils.toast
 import ru.pl.astronomypictureoftheday.view.adapters.PhotoListPagingAdapter
@@ -65,7 +66,7 @@ class PhotoListFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        //state (currently contains ony theme)
+        //state (theme and marked photos list)
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 photoListViewModel.uiState.collect { state ->

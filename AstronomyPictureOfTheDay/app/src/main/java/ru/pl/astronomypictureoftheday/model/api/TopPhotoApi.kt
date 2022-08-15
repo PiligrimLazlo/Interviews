@@ -2,7 +2,6 @@ package ru.pl.astronomypictureoftheday.model.api
 
 import retrofit2.http.GET
 import retrofit2.http.Query
-import ru.pl.astronomypictureoftheday.model.TopPhotoResponse
 
 private const val API_KEY = "g2i26rNZnPGzrK7pV62jkvSwj3aKPwojszearVQ3"
 
