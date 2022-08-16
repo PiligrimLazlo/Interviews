@@ -1,42 +1,44 @@
 package ru.pl.astronomypictureoftheday.view.adapters
 
+import android.util.Log
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageButton
+import android.widget.ImageView
+import android.widget.TextView
 import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import ru.pl.astronomypictureoftheday.R
-import ru.pl.astronomypictureoftheday.databinding.BigPhotoListItemBinding
-import ru.pl.astronomypictureoftheday.databinding.RegularPhotoListItemBinding
 import ru.pl.astronomypictureoftheday.model.FavouritePhoto
-import java.lang.IllegalArgumentException
+
+private const val TAG = "PhotoListPagingAdapter"
 
 class PhotoListPagingAdapter(
     private val onPhotoClickListener: (FavouritePhoto) -> Unit,
     private val onSaveButtonPressedListener: (FavouritePhoto) -> Unit,
-) : PagingDataAdapter<FavouritePhoto, RecyclerView.ViewHolder>(TopPhotoComparator) {
+) : PagingDataAdapter<FavouritePhoto, PhotoViewHolder>(TopPhotoComparator) {
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
-        val inflater = LayoutInflater.from(parent.context)
-        return if (viewType == VIEW_TYPE_BIG_ITEM) {
-            val binding = BigPhotoListItemBinding.inflate(inflater, parent, false)
-            BigPhotoViewHolder(binding)
-        } else if (viewType == VIEW_TYPE_REGULAR_ITEM) {
-            val binding = RegularPhotoListItemBinding.inflate(inflater, parent, false)
-            RegularPhotoViewHolder(binding)
-        } else {
-            throw IllegalArgumentException("View type must be 0 or 1")
+    private var count = 0
+
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PhotoViewHolder {
+        val layout = when (viewType) {
+            VIEW_TYPE_REGULAR_ITEM -> R.layout.regular_photo_list_item
+            VIEW_TYPE_BIG_ITEM -> R.layout.big_photo_list_item
+            else -> throw IllegalArgumentException("View type must be 0 or 1")
         }
+        ++count
+        Log.d(TAG, "onCreateViewHolder() count: $count")
+        val inflater = LayoutInflater.from(parent.context).inflate(layout, parent, false)
+        return PhotoViewHolder(inflater)
     }
 
-    override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
+    override fun onBindViewHolder(holder: PhotoViewHolder, position: Int) {
         val photoItem = getItem(position)
         if (photoItem != null) {
-            if (holder is RegularPhotoViewHolder)
-                holder.bind(photoItem, onPhotoClickListener, onSaveButtonPressedListener)
-            else if (holder is BigPhotoViewHolder)
-                holder.bind(photoItem, onPhotoClickListener, onSaveButtonPressedListener)
+            holder.bind(photoItem, onPhotoClickListener, onSaveButtonPressedListener)
         }
     }
 
@@ -61,75 +63,42 @@ object TopPhotoComparator : DiffUtil.ItemCallback<FavouritePhoto>() {
 }
 
 
-//todo вынести повторный код в общего родителя (но как)
-class RegularPhotoViewHolder(private val binding: RegularPhotoListItemBinding) :
-    RecyclerView.ViewHolder(binding.root) {
+//не использую viewBinding, т.к. будет 2 почти одинаковых класса с разными binding
+class PhotoViewHolder(private val view: View) :
+    RecyclerView.ViewHolder(view) {
+
+    private val topPhotoTv = view.findViewById<TextView>(R.id.top_photo_tv)
+    private val topPhotoImage = view.findViewById<ImageView>(R.id.top_photo_image)
+    private val starBtn = view.findViewById<ImageButton>(R.id.star_btn)
+
     fun bind(
         favouritePhoto: FavouritePhoto,
         onPhotoClickListener: (FavouritePhoto) -> Unit,
         onSaveButtonPressedListener: (FavouritePhoto) -> Unit
     ) {
-        binding.topPhotoTv.text = favouritePhoto.title
-        Glide.with(binding.root.context)
-            .load(favouritePhoto.imageUrl)
-            .placeholder(R.drawable.placeholder_200x200)
-            .error(R.drawable.error_200x200)
-            .into(binding.topPhotoImage)
-
-        binding.root.setOnClickListener {
-            onPhotoClickListener(favouritePhoto)
-        }
-
-        binding.starBtn.setOnClickListener {
-            favouritePhoto.isFavourite = !favouritePhoto.isFavourite
-            updateColor(favouritePhoto.isFavourite)
-
-            onSaveButtonPressedListener(favouritePhoto)
-        }
-
-        updateColor(favouritePhoto.isFavourite)
-    }
-
-    private fun updateColor(isFavourite: Boolean) {
-        binding.starBtn.background.setTint(
-            if (isFavourite) binding.root.context.getColor(R.color.accent)
-            else binding.root.context.getColor(R.color.white)
-        )
-    }
-}
-
-class BigPhotoViewHolder(private val binding: BigPhotoListItemBinding) :
-    RecyclerView.ViewHolder(binding.root) {
-    fun bind(
-        favouritePhoto: FavouritePhoto,
-        onPhotoClickListener: (FavouritePhoto) -> Unit,
-        onSaveButtonPressedListener: (FavouritePhoto) -> Unit
-    ) {
-        binding.topPhotoTv.text = favouritePhoto.title
-        Glide.with(binding.root.context)
+        topPhotoTv.text = favouritePhoto.title
+        Glide.with(view.context)
             .load(favouritePhoto.imageUrl)
             .placeholder(R.drawable.placeholder_400x400)
             .error(R.drawable.error_400x400)
-            .into(binding.topPhotoImage)
+            .into(topPhotoImage)
 
-        binding.root.setOnClickListener {
+        view.setOnClickListener {
             onPhotoClickListener(favouritePhoto)
         }
 
-        binding.starBtn.setOnClickListener {
+        starBtn.setOnClickListener {
             favouritePhoto.isFavourite = !favouritePhoto.isFavourite
-
-            onSaveButtonPressedListener(favouritePhoto)
             updateColor(favouritePhoto.isFavourite)
+            onSaveButtonPressedListener(favouritePhoto)
         }
-
         updateColor(favouritePhoto.isFavourite)
     }
 
     private fun updateColor(isFavourite: Boolean) {
-        binding.starBtn.background.setTint(
-            if (isFavourite) binding.root.context.getColor(R.color.accent)
-            else binding.root.context.getColor(R.color.white)
+        starBtn.background.setTint(
+            if (isFavourite) view.context.getColor(R.color.accent)
+            else view.context.getColor(R.color.white)
         )
     }
 }

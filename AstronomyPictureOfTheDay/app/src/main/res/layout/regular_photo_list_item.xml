@@ -24,7 +24,7 @@
             <ImageView
                 android:id="@+id/top_photo_image"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_height="200dp"
                 android:contentDescription="@string/top_photo_image_description"
                 android:scaleType="centerCrop"
                 tools:src="@drawable/placeholder_200x200" />

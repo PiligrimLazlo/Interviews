@@ -46,7 +46,7 @@ class PhotoDetailsViewModel : ViewModel() {
 
         if (!filePath.exists())
             FileOutputStream(filePath).use {
-                bitmap.compress(Bitmap.CompressFormat.PNG, 80, it)
+                bitmap.compress(Bitmap.CompressFormat.JPEG, 80, it)
             }
         _detailsState.update { it.copy(isSavingPhoto = false) }
     }
@@ -63,6 +63,7 @@ class PhotoDetailsViewModel : ViewModel() {
         return@withContext bitmap
     }
 
+    //todo переделать
     suspend fun getDataForWallpapers(url: String, title: String): Pair<Bitmap, Rect> =
         withContext(Dispatchers.IO) {
             _detailsState.update { it.copy(isSettingWallpaper = true) }

@@ -87,6 +87,7 @@ class PhotoDetailsFragment : Fragment() {
             descriptionDetail.justificationMode = Layout.JUSTIFICATION_MODE_INTER_WORD
             descriptionDetail.text = favouritePhoto.explanation
 
+            //todo переделать
             val filePath = ImageManager.getImageFullPathFile(favouritePhoto.title)
             Glide.with(root.context)
                 .load(
