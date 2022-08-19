@@ -27,17 +27,14 @@ class PhotoDetailsViewModel : ViewModel() {
         MutableStateFlow(PhotoDetailsState())
     val details: StateFlow<PhotoDetailsState>
         get() = _detailsState.asStateFlow()
-    private lateinit var bitmap: Bitmap
 
-    //todo Room repository
+    private lateinit var bitmap: Bitmap
 
 
     suspend fun saveImageToInternalFolder(url: String, title: String) {
         _detailsState.update { it.copy(isSavingPhoto = true) }
 
         val filePath = ImageManager.getImageFullPathFile(title)
-        Log.d(TAG, filePath.absolutePath)
-
         if (filePath.exists() && !::bitmap.isInitialized) {
             bitmap = BitmapFactory.decodeFile(filePath.absolutePath)
         } else if (!::bitmap.isInitialized) {
@@ -64,7 +61,7 @@ class PhotoDetailsViewModel : ViewModel() {
     }
 
     //todo переделать
-    suspend fun getDataForWallpapers(url: String, title: String): Pair<Bitmap, Rect> =
+    suspend fun getDataForWallpapers(url: String, title: String): WallpaperSetHelper =
         withContext(Dispatchers.IO) {
             _detailsState.update { it.copy(isSettingWallpaper = true) }
             val filePath = ImageManager.getImageFullPathFile(title)
@@ -101,14 +98,19 @@ class PhotoDetailsViewModel : ViewModel() {
                 start.y = (bitmap.height - wallpaperHeight) / 2
                 end.y = start.y + wallpaperHeight
             }
-            return@withContext Pair(bitmap, Rect(start.x, start.y, end.x, end.y))
+            return@withContext WallpaperSetHelper(bitmap, Rect(start.x, start.y, end.x, end.y))
         }
 
     fun updateStateWallpapersSet() {
         _detailsState.update { it.copy(isSettingWallpaper = false) }
     }
-
 }
+
+//использую для установки обоев
+data class WallpaperSetHelper(
+    val bitmap: Bitmap,
+    val rect: Rect
+)
 
 data class PhotoDetailsState(
     val isSavingPhoto: Boolean = false,

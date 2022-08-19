@@ -10,4 +10,10 @@
     <string name="successfully_saved_picture">"successfully saved in \"Pictures\" folder"</string>
     <string name="picture_saved">Picture saved</string>
     <string name="added_to_favourites">added to favourites</string>
+    <string name="error">Error</string>
+    <string name="write_permission_not_granted_error">Write external storage permission did not received!</string>
+    <string name="removed_from_favourites">removed from favourites</string>
+    <string name="view_type_exception">View type must be 0 or 1</string>
+    <string name="photos">All photos</string>
+    <string name="favourites">Favourites</string>
 </resources>

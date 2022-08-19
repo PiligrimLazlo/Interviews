@@ -1,12 +1,12 @@
 package ru.pl.astronomypictureoftheday.view.photolist
 
 import android.os.Bundle
-import android.util.Log
 import android.view.*
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.view.MenuProvider
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.setFragmentResultListener
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
@@ -21,10 +21,11 @@ import ru.pl.astronomypictureoftheday.R
 import ru.pl.astronomypictureoftheday.databinding.FragmentPhotoListBinding
 import ru.pl.astronomypictureoftheday.model.repositories.PreferencesRepository.Companion.THEME_DARK
 import ru.pl.astronomypictureoftheday.model.repositories.PreferencesRepository.Companion.THEME_LIGHT
-import ru.pl.astronomypictureoftheday.utils.setAppBarTitle
+import ru.pl.astronomypictureoftheday.utils.findTopNavController
 import ru.pl.astronomypictureoftheday.utils.toast
 import ru.pl.astronomypictureoftheday.view.adapters.PhotoListPagingAdapter
 import ru.pl.astronomypictureoftheday.view.adapters.PhotoLoadStateAdapter
+import ru.pl.astronomypictureoftheday.view.bottomnav.TabsFragmentDirections
 import kotlin.properties.Delegates
 
 private const val TAG = "PhotoListFragment";
@@ -47,13 +48,9 @@ class PhotoListFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         _binding = FragmentPhotoListBinding.inflate(inflater, container, false)
-
         setUpMenu()
-
         binding.photoGrid.layoutManager = setUpLayoutManager()
-
-        setAppBarTitle(getString(R.string.app_name))
-
+        //setAppBarTitle(getString(R.string.app_name))
         return binding.root
     }
 
@@ -67,6 +64,59 @@ class PhotoListFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         //state (theme and marked photos list)
+        collectUiState()
+        //paging adapter
+        val pagingAdapter = setupPagingAdapter()
+        //footer progress + error msg + retry btn
+        setUpAdapterHeaderAndFooter(pagingAdapter)
+        //paging collect data from viewModel
+        collectAdapterData(pagingAdapter)
+        //paging center retry button listener
+        binding.retryButton.setOnClickListener { pagingAdapter.retry() }
+        //paging center progress and btn visibility
+        collectAdapterLoadState(pagingAdapter)
+    }
+
+    private fun setupPagingAdapter(): PhotoListPagingAdapter {
+        return PhotoListPagingAdapter({
+            findTopNavController().navigate(TabsFragmentDirections.goToDetails(it, it.title))
+        }, {
+            if (it.isFavourite) {
+                toast("\"${it.title}\" ${getString(R.string.added_to_favourites)}")
+            } else {
+                toast("\"${it.title}\" ${getString(R.string.removed_from_favourites)}")
+            }
+            photoListViewModel.onSaveFavouriteButtonPressed(it)
+        })
+    }
+
+    private fun collectAdapterLoadState(pagingAdapter: PhotoListPagingAdapter) {
+        viewLifecycleOwner.lifecycleScope.launch {
+            pagingAdapter.loadStateFlow.collect { loadState ->
+                binding.progressBar.isVisible = loadState.source.refresh is LoadState.Loading
+                binding.retryButton.isVisible = loadState.source.refresh is LoadState.Error
+            }
+        }
+    }
+
+    private fun collectAdapterData(pagingAdapter: PhotoListPagingAdapter) {
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                photoListViewModel.favouritePhotoItemsFromPaging.collectLatest {
+                    pagingAdapter.submitData(it)
+                }
+            }
+        }
+    }
+
+    private fun setUpAdapterHeaderAndFooter(pagingAdapter: PhotoListPagingAdapter) {
+        binding.photoGrid.adapter = pagingAdapter.withLoadStateHeaderAndFooter(
+            header = PhotoLoadStateAdapter { pagingAdapter.retry() },
+            footer = PhotoLoadStateAdapter { pagingAdapter.retry() }
+        )
+    }
+
+    private fun collectUiState() {
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 photoListViewModel.uiState.collect { state ->
@@ -80,40 +130,6 @@ class PhotoListFragment : Fragment() {
                 }
             }
         }
-
-        //paging adapter
-        val pagingAdapter = PhotoListPagingAdapter({
-            findNavController().navigate(PhotoListFragmentDirections.goToDetails(it))
-        }, {
-            toast("\"${it.title}\" ${getString(R.string.added_to_favourites)}")
-            photoListViewModel.onSaveFavouriteButtonPressed(it)
-        })
-        //footer progress + error msg + retry btn
-        binding.photoGrid.adapter = pagingAdapter.withLoadStateHeaderAndFooter(
-            header = PhotoLoadStateAdapter { pagingAdapter.retry() },
-            footer = PhotoLoadStateAdapter { pagingAdapter.retry() }
-        )
-
-        //paging collect data from viewModel
-        viewLifecycleOwner.lifecycleScope.launch {
-            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                photoListViewModel.favouritePhotoItemsFromPaging.collectLatest {
-                    pagingAdapter.submitData(it)
-                }
-            }
-        }
-
-        //paging center retry button listener
-        binding.retryButton.setOnClickListener { pagingAdapter.retry() }
-
-        //paging center progress and btn visibility
-        viewLifecycleOwner.lifecycleScope.launch {
-            pagingAdapter.loadStateFlow.collect { loadState ->
-                binding.progressBar.isVisible = loadState.source.refresh is LoadState.Loading
-                binding.retryButton.isVisible = loadState.source.refresh is LoadState.Error
-            }
-        }
-
     }
 
 

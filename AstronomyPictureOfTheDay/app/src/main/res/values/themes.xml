@@ -6,8 +6,8 @@
         <item name="colorPrimaryVariant">@color/dark_space</item>
         <item name="colorOnPrimary">@color/white</item>
         <!-- Secondary brand color. -->
-        <item name="colorSecondary">@android:color/holo_orange_dark</item>
-        <item name="colorSecondaryVariant">@android:color/holo_orange_light</item>
+        <item name="colorSecondary">@android:color/holo_blue_dark</item>
+        <item name="colorSecondaryVariant">@android:color/holo_blue_light</item>
         <item name="colorOnSecondary">@color/black</item>
         <!-- Status bar color. -->
         <item name="android:statusBarColor" >?attr/colorPrimaryVariant</item>
@@ -55,6 +55,10 @@
 
     <style name="SwitchCompatTheme" >
         <item name="colorControlActivated">@color/accent</item>
+    </style>
+
+    <style name="ToolbarColoredBackArrow" parent="ThemeOverlay.AppCompat.Dark">
+        <item name="android:textColorSecondary">@color/white</item>
     </style>
 
 

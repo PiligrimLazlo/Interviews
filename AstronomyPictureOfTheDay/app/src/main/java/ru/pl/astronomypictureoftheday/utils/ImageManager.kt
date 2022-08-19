@@ -5,7 +5,8 @@ import java.io.File
 
 object ImageManager {
     fun getImageFullPathFile(title: String): File {
-        val fileName = "NasaAPOD_$title.jpg"
+        val formattedTitle = title.replace(Regex("[: ]"), "")
+        val fileName = "NasaAPOD_$formattedTitle.jpg"
         return File(
             Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES),
             fileName

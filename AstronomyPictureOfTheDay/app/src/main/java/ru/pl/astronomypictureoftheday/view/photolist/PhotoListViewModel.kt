@@ -31,8 +31,41 @@ class PhotoListViewModel : ViewModel() {
     val favouritePhotoItemsFromPaging: Flow<PagingData<FavouritePhoto>>
 
     init {
+        //собираем тему из репозитория настроек
+        collectTheme()
+        //собираем сохр избранные фотки из репозитория БД
+        collectSavedPhotos()
+        //при первой загрузке подменяем айтемы
+        favouritePhotoItemsFromPaging = collectInfPhotoList()
+    }
+
+    private fun collectInfPhotoList() : Flow<PagingData<FavouritePhoto>> {
+        return netPhotoRepository
+            .fetchTopPhotos()
+            .map {
+                it.map { oldFavPhoto ->
+                    val newFavPhoto =
+                        _uiState.value.favouritePhotosList.find { favouritePhoto ->
+                            favouritePhoto.title == oldFavPhoto.title
+                        }
+                    newFavPhoto ?: oldFavPhoto
+                }
+            }
+            .cachedIn(viewModelScope)
+    }
+
+    private fun collectSavedPhotos() {
         viewModelScope.launch {
-            //собираем тему из репозитория настроек
+            dbPhotoRepository.getFavouritePhotos().collectLatest { newFavPhotoList ->
+                _uiState.update {
+                    it.copy(favouritePhotosList = newFavPhotoList)
+                }
+            }
+        }
+    }
+
+    private fun collectTheme() {
+        viewModelScope.launch {
             preferencesRepository.storedTheme.collectLatest { storedTheme ->
                 try {
                     _uiState.update { oldState ->
@@ -43,29 +76,6 @@ class PhotoListViewModel : ViewModel() {
                 }
             }
         }
-
-        viewModelScope.launch {
-            //собираем сохр избранные фотки из репозитория БД
-            dbPhotoRepository.getFavouritePhotos().collectLatest { newFavPhotoList ->
-                _uiState.update {
-                    it.copy(favouritePhotosList = newFavPhotoList)
-                }
-            }
-        }
-
-        //при первой загрузке подменяем айтемы
-        favouritePhotoItemsFromPaging = netPhotoRepository
-            .fetchTopPhotos()
-            .map {
-                it.map { oldFavPhoto ->
-                    val newFavPhoto =
-                        uiState.value.favouritePhotosList.find { favouritePhoto ->
-                            favouritePhoto.title == oldFavPhoto.title
-                        }
-                    newFavPhoto ?: oldFavPhoto
-                }
-            }
-            .cachedIn(viewModelScope)
     }
 
     fun setTheme(theme: Int) {

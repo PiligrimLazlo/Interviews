@@ -3,7 +3,6 @@ package ru.pl.astronomypictureoftheday.view.photodetails
 import android.Manifest
 import android.annotation.SuppressLint
 import android.app.WallpaperManager
-import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.drawable.Drawable
 import android.os.Bundle
@@ -30,7 +29,6 @@ import ru.pl.astronomypictureoftheday.R
 import ru.pl.astronomypictureoftheday.databinding.FragmentPhotoDetailsBinding
 import ru.pl.astronomypictureoftheday.model.FavouritePhoto
 import ru.pl.astronomypictureoftheday.utils.ImageManager
-import ru.pl.astronomypictureoftheday.utils.setAppBarTitle
 import ru.pl.astronomypictureoftheday.utils.toDefaultFormattedDate
 import ru.pl.astronomypictureoftheday.utils.toast
 
@@ -46,6 +44,7 @@ class PhotoDetailsFragment : Fragment() {
     private val args: PhotoDetailsFragmentArgs by navArgs()
     private lateinit var favouritePhoto: FavouritePhoto
 
+    //ask write in memory permission
     private val requestWriteInMemoryPermissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestPermission()
     ) { permissionGranted ->
@@ -59,7 +58,6 @@ class PhotoDetailsFragment : Fragment() {
             }
         }
     }
-
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -76,18 +74,36 @@ class PhotoDetailsFragment : Fragment() {
     }
 
 
-    @SuppressLint("WrongConstant")
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
         favouritePhoto = args.favouritePhoto
-
         //init photo and text load
+        initialLoadDataIntoScreen()
+        //setAppBarTitle(favouritePhoto.title)
+        collectUiState()
+
+        binding.saveToGalleryBtn.setOnClickListener { requestWriteInMemoryPermission() }
+        binding.setWallpapersBtn.setOnClickListener {
+            setWallpaper(favouritePhoto.imageHdUrl, favouritePhoto.title)
+        }
+    }
+
+    private fun collectUiState() {
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                photoDetailsViewModel.details.collect { state ->
+                    updateUi(state)
+                }
+            }
+        }
+    }
+
+    @SuppressLint("WrongConstant")
+    private fun initialLoadDataIntoScreen() {
         binding.apply {
             descriptionDetail.justificationMode = Layout.JUSTIFICATION_MODE_INTER_WORD
             descriptionDetail.text = favouritePhoto.explanation
 
-            //todo переделать
             val filePath = ImageManager.getImageFullPathFile(favouritePhoto.title)
             Glide.with(root.context)
                 .load(
@@ -104,34 +120,15 @@ class PhotoDetailsFragment : Fragment() {
                 })
                 .into(imageDetail)
 
-
-            setAppBarTitle(favouritePhoto.title)
-
             dateDetail.text = favouritePhoto.date.toDefaultFormattedDate()
-        }
-
-        viewLifecycleOwner.lifecycleScope.launch {
-            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                photoDetailsViewModel.details.collect { state ->
-                    updateUi(state)
-                }
-            }
-        }
-
-        binding.saveToGalleryBtn.setOnClickListener {
-            requestWriteInMemoryPermission()
-        }
-
-        binding.setWallpapersBtn.setOnClickListener {
-            setWallpaper(favouritePhoto.imageHdUrl, favouritePhoto.title)
         }
     }
 
     private fun requestWriteInMemoryPermission() {
         if (shouldShowRequestPermissionRationale(Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
             showRationaleDialog(
-                "Error",
-                "Write external storage permission did not received! (message from dialog)"
+                getString(R.string.error),
+                getString(R.string.write_permission_not_granted_error)
             )
         } else {
             requestWriteInMemoryPermissionLauncher.launch(Manifest.permission.WRITE_EXTERNAL_STORAGE)
@@ -153,11 +150,15 @@ class PhotoDetailsFragment : Fragment() {
     }
 
     //todo add dialog with 3 choices: 1)homescreen 2)lockscreen 3)cancel
+    //todo переделать, передавать application context,
+    //todo наследовать PhotoDetailsViewModel от AndroidViewModel
     private fun setWallpaper(url: String, title: String) {
         viewLifecycleOwner.lifecycleScope.launch(Dispatchers.IO) {
             val wallpaperManager = WallpaperManager.getInstance(requireContext())
-            val data = photoDetailsViewModel.getDataForWallpapers(url, title)
-            wallpaperManager.setBitmap(data.first, data.second, false)
+            val wallpaperSetHelper = photoDetailsViewModel.getDataForWallpapers(url, title)
+            wallpaperManager.setBitmap(
+                wallpaperSetHelper.bitmap, wallpaperSetHelper.rect, false
+            )
             photoDetailsViewModel.updateStateWallpapersSet()
             requireActivity().runOnUiThread { toast(getString(R.string.wallpapers_set)) }
         }
