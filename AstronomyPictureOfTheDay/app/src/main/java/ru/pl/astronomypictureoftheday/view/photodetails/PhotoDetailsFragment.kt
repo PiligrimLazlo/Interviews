@@ -2,7 +2,6 @@ package ru.pl.astronomypictureoftheday.view.photodetails
 
 import android.Manifest
 import android.annotation.SuppressLint
-import android.app.WallpaperManager
 import android.graphics.BitmapFactory
 import android.graphics.drawable.Drawable
 import android.os.Bundle
@@ -23,7 +22,6 @@ import com.bumptech.glide.load.DataSource
 import com.bumptech.glide.load.engine.GlideException
 import com.bumptech.glide.request.RequestListener
 import com.bumptech.glide.request.target.Target
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import ru.pl.astronomypictureoftheday.R
 import ru.pl.astronomypictureoftheday.databinding.FragmentPhotoDetailsBinding
@@ -40,7 +38,9 @@ class PhotoDetailsFragment : Fragment() {
             getString(R.string.binding_null_error)
         }
 
-    private val photoDetailsViewModel: PhotoDetailsViewModel by viewModels()
+    private val photoDetailsViewModel: PhotoDetailsViewModel by viewModels {
+        ViewModelFactoryDetails(requireActivity().application, favouritePhoto)
+    }
     private val args: PhotoDetailsFragmentArgs by navArgs()
     private lateinit var favouritePhoto: FavouritePhoto
 
@@ -49,14 +49,13 @@ class PhotoDetailsFragment : Fragment() {
         ActivityResultContracts.RequestPermission()
     ) { permissionGranted ->
         if (permissionGranted) {
-            viewLifecycleOwner.lifecycleScope.launch {
-                photoDetailsViewModel.saveImageToInternalFolder(
-                    favouritePhoto.imageHdUrl,
-                    favouritePhoto.title
-                )
-                requireActivity().runOnUiThread { toast(getString(R.string.successfully_saved_picture)) }
-            }
+            photoDetailsViewModel.saveImageToInternalFolder()
         }
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        favouritePhoto = args.favouritePhoto
     }
 
     override fun onCreateView(
@@ -68,30 +67,29 @@ class PhotoDetailsFragment : Fragment() {
         return binding.root
     }
 
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        //setAppBarTitle(favouritePhoto.title)
+        collectUiState()
+        //init photo and text load
+        initialLoadDataIntoScreen()
+
+        binding.saveToGalleryBtn.setOnClickListener { requestWriteInMemoryPermission() }
+        binding.setWallpapersBtn.setOnClickListener {
+            photoDetailsViewModel.setWallpapers()
+        }
+    }
+
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
     }
 
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-        favouritePhoto = args.favouritePhoto
-        //init photo and text load
-        initialLoadDataIntoScreen()
-        //setAppBarTitle(favouritePhoto.title)
-        collectUiState()
-
-        binding.saveToGalleryBtn.setOnClickListener { requestWriteInMemoryPermission() }
-        binding.setWallpapersBtn.setOnClickListener {
-            setWallpaper(favouritePhoto.imageHdUrl, favouritePhoto.title)
-        }
-    }
-
     private fun collectUiState() {
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                photoDetailsViewModel.details.collect { state ->
+                photoDetailsViewModel.detailsState.collect { state ->
                     updateUi(state)
                 }
             }
@@ -100,6 +98,7 @@ class PhotoDetailsFragment : Fragment() {
 
     @SuppressLint("WrongConstant")
     private fun initialLoadDataIntoScreen() {
+
         binding.apply {
             descriptionDetail.justificationMode = Layout.JUSTIFICATION_MODE_INTER_WORD
             descriptionDetail.text = favouritePhoto.explanation
@@ -123,6 +122,7 @@ class PhotoDetailsFragment : Fragment() {
             dateDetail.text = favouritePhoto.date.toDefaultFormattedDate()
         }
     }
+
 
     private fun requestWriteInMemoryPermission() {
         if (shouldShowRequestPermissionRationale(Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
@@ -149,20 +149,6 @@ class PhotoDetailsFragment : Fragment() {
             .show()
     }
 
-    //todo add dialog with 3 choices: 1)homescreen 2)lockscreen 3)cancel
-    //todo переделать, передавать application context,
-    //todo наследовать PhotoDetailsViewModel от AndroidViewModel
-    private fun setWallpaper(url: String, title: String) {
-        viewLifecycleOwner.lifecycleScope.launch(Dispatchers.IO) {
-            val wallpaperManager = WallpaperManager.getInstance(requireContext())
-            val wallpaperSetHelper = photoDetailsViewModel.getDataForWallpapers(url, title)
-            wallpaperManager.setBitmap(
-                wallpaperSetHelper.bitmap, wallpaperSetHelper.rect, false
-            )
-            photoDetailsViewModel.updateStateWallpapersSet()
-            requireActivity().runOnUiThread { toast(getString(R.string.wallpapers_set)) }
-        }
-    }
 
     private fun updateUi(state: PhotoDetailsState) {
         binding.apply {
@@ -180,6 +166,9 @@ class PhotoDetailsFragment : Fragment() {
                 saveToGalleryBtn.visibility = View.VISIBLE
                 progressBarSave.visibility = View.INVISIBLE
             }
+            //todo как-то вывести тосты
+            toast(getString(R.string.picture_saved))
+            toast(getString(R.string.wallpapers_set))
         }
     }
 }
