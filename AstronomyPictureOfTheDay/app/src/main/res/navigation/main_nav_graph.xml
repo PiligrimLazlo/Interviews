@@ -1,21 +1,28 @@
 <?xml version="1.0" encoding="utf-8"?>
 <navigation xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/main_nav_graph"
     app:startDestination="@id/tabsFragment">
 
     <fragment
         android:id="@+id/tabsFragment"
         android:name="ru.pl.astronomypictureoftheday.view.bottomnav.TabsFragment"
-        android:label="TabsFragment" >
+        android:label="TabsFragment"
+        tools:layout="@layout/fragment_bottom_nav">
         <action
             android:id="@+id/go_to_details"
-            app:destination="@id/photoDetailsFragment" />
+            app:destination="@id/photoDetailsFragment"
+            app:enterAnim="@anim/enter_anim"
+            app:exitAnim="@anim/exit_anim"
+            app:popEnterAnim="@anim/enter_anim"
+            app:popExitAnim="@anim/exit_anim" />
     </fragment>
     <fragment
         android:id="@+id/photoDetailsFragment"
         android:name="ru.pl.astronomypictureoftheday.view.photodetails.PhotoDetailsFragment"
-        android:label="PhotoDetailsFragment" >
+        android:label="PhotoDetailsFragment"
+        tools:layout="@layout/fragment_photo_details">
         <argument
             android:name="favouritePhoto"
             app:argType="ru.pl.astronomypictureoftheday.model.FavouritePhoto" />
