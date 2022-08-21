@@ -13,11 +13,12 @@ import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
 import retrofit2.create
 import ru.pl.astronomypictureoftheday.model.FavouritePhoto
-import ru.pl.astronomypictureoftheday.model.TopPhotoPagingSource
+import ru.pl.astronomypictureoftheday.model.PhotoMapper
 import ru.pl.astronomypictureoftheday.model.api.TopPhotoApi
+import ru.pl.astronomypictureoftheday.model.api.TopPhotoPagingSource
 import ru.pl.astronomypictureoftheday.utils.JsonDateAdapter
 
-class NasaPhotoRepository {
+class NetPhotoRepository {
     //todo передавать в конструкторе
     private val topPhotoApi: TopPhotoApi by lazy {
         val moshiBuilder = Moshi.Builder().add(JsonDateAdapter())
@@ -32,6 +33,7 @@ class NasaPhotoRepository {
             .build()
         retrofit.create()
     }
+    private val mapper: PhotoMapper = PhotoMapper()
 
 
     //for paging lib
@@ -45,7 +47,11 @@ class NasaPhotoRepository {
             ),
             pagingSourceFactory = { TopPhotoPagingSource(topPhotoApi) }
         ).flow
-            .map { it.map { it.toFavouritePhoto() } }
+            .map { pagingData ->
+                pagingData.map { topPhotoResponse ->
+                    mapper.responseToFavouritePhoto(topPhotoResponse)
+                }
+            }
     }
 
     private companion object {

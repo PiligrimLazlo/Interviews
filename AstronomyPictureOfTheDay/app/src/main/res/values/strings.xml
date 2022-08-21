@@ -16,4 +16,5 @@
     <string name="view_type_exception">View type must be 0 or 1</string>
     <string name="photos">All photos</string>
     <string name="favourites">Favourites</string>
+    <string name="downloading_failed">Downloading failed</string>
 </resources>

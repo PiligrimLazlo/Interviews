@@ -28,7 +28,6 @@ import ru.pl.astronomypictureoftheday.databinding.FragmentPhotoDetailsBinding
 import ru.pl.astronomypictureoftheday.model.FavouritePhoto
 import ru.pl.astronomypictureoftheday.utils.ImageManager
 import ru.pl.astronomypictureoftheday.utils.toDefaultFormattedDate
-import ru.pl.astronomypictureoftheday.utils.toast
 
 class PhotoDetailsFragment : Fragment() {
 
@@ -75,7 +74,9 @@ class PhotoDetailsFragment : Fragment() {
         //init photo and text load
         initialLoadDataIntoScreen()
 
-        binding.saveToGalleryBtn.setOnClickListener { requestWriteInMemoryPermission() }
+        binding.saveToGalleryBtn.setOnClickListener {
+            requestWriteInMemoryPermission()
+        }
         binding.setWallpapersBtn.setOnClickListener {
             photoDetailsViewModel.setWallpapers()
         }
@@ -158,6 +159,8 @@ class PhotoDetailsFragment : Fragment() {
             } else {
                 setWallpapersBtn.visibility = View.VISIBLE
                 progressBarWallpapers.visibility = View.INVISIBLE
+                //todo fix
+                //toast(getString(R.string.wallpapers_set))
             }
             if (state.isSavingPhoto) {
                 saveToGalleryBtn.visibility = View.INVISIBLE
@@ -165,10 +168,10 @@ class PhotoDetailsFragment : Fragment() {
             } else {
                 saveToGalleryBtn.visibility = View.VISIBLE
                 progressBarSave.visibility = View.INVISIBLE
+                //todo fix
+                //toast(getString(R.string.picture_saved))
             }
-            //todo как-то вывести тосты
-            toast(getString(R.string.picture_saved))
-            toast(getString(R.string.wallpapers_set))
+
         }
     }
 }

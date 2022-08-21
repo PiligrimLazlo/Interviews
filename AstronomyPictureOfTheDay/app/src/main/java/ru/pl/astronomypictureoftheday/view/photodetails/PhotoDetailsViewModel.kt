@@ -16,7 +16,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import ru.pl.astronomypictureoftheday.R
 import ru.pl.astronomypictureoftheday.model.FavouritePhoto
 import ru.pl.astronomypictureoftheday.utils.ImageManager
 import java.io.FileOutputStream
@@ -55,7 +55,7 @@ class PhotoDetailsViewModel(
         }
     }
 
-    private suspend fun downloadBitmapFromNet(): Bitmap? = withContext(Dispatchers.IO) {
+    private fun downloadBitmapFromNet(): Bitmap? {
         var bitmap: Bitmap? = null
         try {
             val urlEntity = URL(photo.imageHdUrl)
@@ -64,15 +64,16 @@ class PhotoDetailsViewModel(
         } catch (e: Exception) {
             e.printStackTrace()
         }
-        return@withContext bitmap
+        return bitmap
     }
 
-    private suspend fun loadPhoto() {
+    private fun loadPhoto() {
         val file = ImageManager.getImageFullPathFile(photo.title)
         if (file.exists()) {
             bitmap = BitmapFactory.decodeFile(file.absolutePath)
         } else if (!::bitmap.isInitialized) {
-            bitmap = downloadBitmapFromNet() ?: throw IllegalArgumentException()
+            bitmap = downloadBitmapFromNet()
+                ?: throw IllegalArgumentException(application.getString(R.string.downloading_failed))
         }
     }
 

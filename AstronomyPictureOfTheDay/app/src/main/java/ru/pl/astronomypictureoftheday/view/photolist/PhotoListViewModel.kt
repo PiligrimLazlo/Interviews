@@ -12,8 +12,8 @@ import kotlinx.coroutines.launch
 import ru.pl.astronomypictureoftheday.model.repositories.PreferencesRepository
 import ru.pl.astronomypictureoftheday.model.repositories.PreferencesRepository.Companion.THEME_LIGHT
 import ru.pl.astronomypictureoftheday.model.FavouritePhoto
-import ru.pl.astronomypictureoftheday.model.repositories.NasaPhotoRepository
-import ru.pl.astronomypictureoftheday.model.repositories.FavouritePhotoRepository
+import ru.pl.astronomypictureoftheday.model.repositories.NetPhotoRepository
+import ru.pl.astronomypictureoftheday.model.repositories.DbPhotoRepository
 import ru.pl.astronomypictureoftheday.utils.ImageManager
 
 private const val TAG = "PhotoListViewModel";
@@ -21,8 +21,8 @@ private const val TAG = "PhotoListViewModel";
 class PhotoListViewModel : ViewModel() {
     //todo передавать в конструкторе
     private val preferencesRepository = PreferencesRepository.get()
-    private val netPhotoRepository = NasaPhotoRepository()
-    private val dbPhotoRepository = FavouritePhotoRepository.get()
+    private val netPhotoRepository = NetPhotoRepository()
+    private val dbPhotoRepository = DbPhotoRepository.get()
 
     private val _uiState: MutableStateFlow<PhotoListUiState> = MutableStateFlow(PhotoListUiState())
     val uiState: StateFlow<PhotoListUiState>

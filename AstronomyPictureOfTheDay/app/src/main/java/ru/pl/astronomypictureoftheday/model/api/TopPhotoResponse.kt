@@ -12,14 +12,4 @@ data class TopPhotoResponse(
     val explanation: String,
     @Json(name = "url") val imageUrl: String,
     @Json(name = "hdurl") val imageHdUrl: String = ""
-) {
-
-    fun toFavouritePhoto(): FavouritePhoto = FavouritePhoto(
-        date = date,
-        title = title,
-        explanation = explanation,
-        imageUrl = imageUrl,
-        imageHdUrl = imageHdUrl
-    )
-
-}
+)

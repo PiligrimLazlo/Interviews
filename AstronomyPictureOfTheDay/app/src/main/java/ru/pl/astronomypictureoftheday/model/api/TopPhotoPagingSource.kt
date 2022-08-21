@@ -1,4 +1,4 @@
-package ru.pl.astronomypictureoftheday.model
+package ru.pl.astronomypictureoftheday.model.api
 
 import android.util.Log
 import androidx.paging.PagingSource
