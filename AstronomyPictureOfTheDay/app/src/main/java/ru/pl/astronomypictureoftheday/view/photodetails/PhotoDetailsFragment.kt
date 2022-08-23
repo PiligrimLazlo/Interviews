@@ -48,7 +48,7 @@ class PhotoDetailsFragment : Fragment() {
         ActivityResultContracts.RequestPermission()
     ) { permissionGranted ->
         if (permissionGranted) {
-            photoDetailsViewModel.saveImageToInternalFolder()
+            photoDetailsViewModel.saveImageToPictureFolder()
         }
     }
 
@@ -104,7 +104,11 @@ class PhotoDetailsFragment : Fragment() {
             descriptionDetail.justificationMode = Layout.JUSTIFICATION_MODE_INTER_WORD
             descriptionDetail.text = favouritePhoto.explanation
 
-            val filePath = ImageManager.getImageFullPathFile(favouritePhoto.title)
+            val filePath =
+                ImageManager().getInternalImageFullPathFile(
+                    favouritePhoto.title,
+                    requireContext().filesDir
+                )
             Glide.with(root.context)
                 .load(
                     if (filePath.exists())

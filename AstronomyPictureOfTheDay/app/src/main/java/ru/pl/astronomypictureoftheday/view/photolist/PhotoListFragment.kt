@@ -21,6 +21,7 @@ import ru.pl.astronomypictureoftheday.R
 import ru.pl.astronomypictureoftheday.databinding.FragmentPhotoListBinding
 import ru.pl.astronomypictureoftheday.model.repositories.PreferencesRepository.Companion.THEME_DARK
 import ru.pl.astronomypictureoftheday.model.repositories.PreferencesRepository.Companion.THEME_LIGHT
+import ru.pl.astronomypictureoftheday.utils.ImageManager
 import ru.pl.astronomypictureoftheday.utils.findTopNavController
 import ru.pl.astronomypictureoftheday.utils.toast
 import ru.pl.astronomypictureoftheday.view.adapters.PhotoListPagingAdapter
@@ -86,7 +87,12 @@ class PhotoListFragment : Fragment() {
             } else {
                 toast("\"${it.title}\" ${getString(R.string.removed_from_favourites)}")
             }
-            photoListViewModel.onSaveFavouriteButtonPressed(it)
+            photoListViewModel.onSaveFavouriteButtonPressed(
+                it,
+                ImageManager().getInternalImageFullPathFile(
+                    it.title, requireContext().filesDir
+                )
+            )
         })
     }
 

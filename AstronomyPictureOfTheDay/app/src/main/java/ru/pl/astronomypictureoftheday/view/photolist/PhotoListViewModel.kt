@@ -15,6 +15,7 @@ import ru.pl.astronomypictureoftheday.model.FavouritePhoto
 import ru.pl.astronomypictureoftheday.model.repositories.NetPhotoRepository
 import ru.pl.astronomypictureoftheday.model.repositories.DbPhotoRepository
 import ru.pl.astronomypictureoftheday.utils.ImageManager
+import java.io.File
 
 private const val TAG = "PhotoListViewModel";
 
@@ -30,6 +31,8 @@ class PhotoListViewModel : ViewModel() {
 
     val favouritePhotoItemsFromPaging: Flow<PagingData<FavouritePhoto>>
 
+    private val imageManager: ImageManager = ImageManager()
+
     init {
         //собираем тему из репозитория настроек
         collectTheme()
@@ -39,7 +42,7 @@ class PhotoListViewModel : ViewModel() {
         favouritePhotoItemsFromPaging = collectInfPhotoList()
     }
 
-    private fun collectInfPhotoList() : Flow<PagingData<FavouritePhoto>> {
+    private fun collectInfPhotoList(): Flow<PagingData<FavouritePhoto>> {
         return netPhotoRepository
             .fetchTopPhotos()
             .map {
@@ -84,19 +87,21 @@ class PhotoListViewModel : ViewModel() {
         }
     }
 
-    fun onSaveFavouriteButtonPressed(favouritePhoto: FavouritePhoto) {
+    fun onSaveFavouriteButtonPressed(photo: FavouritePhoto, filePath: File) {
         viewModelScope.launch(Dispatchers.IO) {
             //todo localPhotoPath - где-то взять
-            if (dbPhotoRepository.getFavouritePhoto(favouritePhoto.title) == null) {
+            //сохраняем запись в базу и фото в кэш
+            if (dbPhotoRepository.getFavouritePhoto(photo.title) == null) {
                 dbPhotoRepository.addFavouritePhoto(
-                    favouritePhoto.copy(
+                    photo.copy(
                         isFavourite = true,
-                        localPhotoPath =
-                        ImageManager.getImageFullPathFile(favouritePhoto.title).absolutePath
+                        localPhotoPath = filePath.absolutePath
                     )
                 )
+            imageManager.savePhoto(photo.imageUrl, filePath)
             } else {
-                dbPhotoRepository.deleteFavouritePhoto(favouritePhoto.title)
+                dbPhotoRepository.deleteFavouritePhoto(photo.title)
+                imageManager.deletePhoto(filePath)
             }
         }
     }
