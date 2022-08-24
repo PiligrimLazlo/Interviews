@@ -2,10 +2,7 @@ package ru.pl.astronomypictureoftheday.model.repositories
 
 import android.content.Context
 import androidx.datastore.core.DataStore
-import androidx.datastore.preferences.core.PreferenceDataStoreFactory
-import androidx.datastore.preferences.core.Preferences
-import androidx.datastore.preferences.core.edit
-import androidx.datastore.preferences.core.intPreferencesKey
+import androidx.datastore.preferences.core.*
 import androidx.datastore.preferences.preferencesDataStoreFile
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -24,10 +21,22 @@ class PreferencesRepository private constructor(private val dataStore: DataStore
         }
     }
 
+    val storedAutoWallpEnabled: Flow<Boolean> = dataStore.data.map {
+        it[AUTO_WALLP_KEY] ?: false
+    }.distinctUntilChanged()
+
+    suspend fun setAutoWallpEnabled(isEnabled: Boolean) {
+        dataStore.edit {
+            it[AUTO_WALLP_KEY] = isEnabled
+        }
+    }
+
     companion object {
         private val THEME_KEY = intPreferencesKey("theme_key")
         const val THEME_LIGHT = 0
         const val THEME_DARK = 1
+
+        private val AUTO_WALLP_KEY = booleanPreferencesKey("wallp_key")
 
         private var INSTANCE: PreferencesRepository? = null
 

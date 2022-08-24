@@ -58,6 +58,7 @@
     </style>
 
     <style name="ToolbarColoredBackArrow" parent="ThemeOverlay.AppCompat.Dark">
+        <item name="android:textColor">@color/main_color</item>
         <item name="android:textColorSecondary">@color/white</item>
     </style>
 

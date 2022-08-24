@@ -1,6 +1,7 @@
 package ru.pl.astronomypictureoftheday.view.bottomnav
 
 import android.os.Bundle
+import android.util.Log
 import android.view.*
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.view.MenuProvider
@@ -18,7 +19,9 @@ import ru.pl.astronomypictureoftheday.databinding.FragmentBottomNavBinding
 import ru.pl.astronomypictureoftheday.model.repositories.PreferencesRepository
 import kotlin.properties.Delegates
 
-class TabsFragment: Fragment() {
+private const val TAG = "TabsFragmentTag"
+
+class TabsFragment : Fragment() {
 
     private var _binding: FragmentBottomNavBinding? = null
     private val binding
@@ -28,6 +31,7 @@ class TabsFragment: Fragment() {
 
     private val tabsViewModel: TabsViewModel by viewModels()
     private var currentTheme by Delegates.notNull<Int>()
+    private var checkedAutoWallpapersSet by Delegates.notNull<Boolean>()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -64,6 +68,10 @@ class TabsFragment: Fragment() {
                         else
                             AppCompatDelegate.MODE_NIGHT_YES
                     AppCompatDelegate.setDefaultNightMode(themeMode)
+
+                    checkedAutoWallpapersSet = state.isAutoWallpapersEnabled
+                    Log.d(TAG, "tabs state changed $checkedAutoWallpapersSet")
+                    //TODO("Запускать или стопать воркер в зависимости от ↑")
                 }
             }
         }
@@ -74,11 +82,10 @@ class TabsFragment: Fragment() {
         menuHost.addMenuProvider(object : MenuProvider {
             override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
                 menuInflater.inflate(R.menu.menu_main, menu)
+                //это здесь, т.к. отдельный свитч в тулбаре
                 val switchItem = menu.findItem(R.id.enable_dark_mode)
                 switchItem.setActionView(R.layout.switch_dark_mode)
-
-                val switch: SwitchMaterial =
-                    menu.findItem(R.id.enable_dark_mode).actionView.findViewById(R.id.switcher)
+                val switch: SwitchMaterial = switchItem.actionView.findViewById(R.id.switcher)
                 switch.isChecked = currentTheme == PreferencesRepository.THEME_DARK
 
                 switch.setOnCheckedChangeListener { _, isChecked ->
@@ -88,9 +95,20 @@ class TabsFragment: Fragment() {
                         tabsViewModel.setTheme(PreferencesRepository.THEME_LIGHT)
                     }
                 }
+
+                val checkIsAutoWallpEnable = menu.findItem(R.id.switch_set_wallpaper)
+                checkIsAutoWallpEnable.isChecked = checkedAutoWallpapersSet
+
             }
 
             override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
+                when (menuItem.itemId) {
+                    R.id.switch_set_wallpaper -> {
+                        menuItem.isChecked = !menuItem.isChecked
+                        tabsViewModel.setAutoWallpapersEnabled(menuItem.isChecked)
+                    }
+                }
+
                 return true
             }
 

@@ -2,13 +2,12 @@ package ru.pl.astronomypictureoftheday.workers
 
 import android.app.WallpaperManager
 import android.content.Context
-import androidx.work.CoroutineWorker
-import androidx.work.Worker
-import androidx.work.WorkerParameters
+import androidx.work.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import ru.pl.astronomypictureoftheday.model.repositories.NetPhotoRepository
 import ru.pl.astronomypictureoftheday.utils.ImageManager
+import java.util.concurrent.TimeUnit
 
 class WallpaperWorker(
     private val context: Context,
@@ -30,5 +29,22 @@ class WallpaperWorker(
         wallpaperManager.setBitmap(bitmap, rect, false)
 
         return Result.success()
+    }
+
+    companion object {
+        const val AUTO_SET_WALLPAPER = "AUTO_SET_WALLPAPER"
+        private const val INITIAL_DELAY = 15L //minutes
+        private const val PERIOD = 1L //day
+
+        fun makeRequest(): PeriodicWorkRequest {
+            val constraints = Constraints.Builder()
+                .setRequiredNetworkType(NetworkType.CONNECTED)
+                .build()
+
+            return PeriodicWorkRequestBuilder<WallpaperWorker>(PERIOD, TimeUnit.DAYS)
+                .setConstraints(constraints)
+                .setInitialDelay(INITIAL_DELAY, TimeUnit.MINUTES)
+                .build()
+        }
     }
 }
