@@ -13,7 +13,9 @@ import androidx.recyclerview.widget.GridLayoutManager
 import kotlinx.coroutines.launch
 import ru.pl.astronomypictureoftheday.R
 import ru.pl.astronomypictureoftheday.databinding.FragmentFavouritesBinding
+import ru.pl.astronomypictureoftheday.utils.findTopNavController
 import ru.pl.astronomypictureoftheday.view.adapters.PhotoListFavouritesAdapter
+import ru.pl.astronomypictureoftheday.view.bottomnav.TabsFragmentDirections
 
 class FavouritesFragment : Fragment() {
 
@@ -39,7 +41,7 @@ class FavouritesFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         val adapter = PhotoListFavouritesAdapter({
-            //todo
+            findTopNavController().navigate(TabsFragmentDirections.goToDetails(it, it.title))
         }, {
             //todo
         })

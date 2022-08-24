@@ -2,8 +2,10 @@ package ru.pl.astronomypictureoftheday.view.photodetails
 
 import android.Manifest
 import android.annotation.SuppressLint
+import android.content.Context
 import android.graphics.BitmapFactory
 import android.graphics.drawable.Drawable
+import android.net.ConnectivityManager
 import android.os.Bundle
 import android.text.Layout
 import android.view.LayoutInflater
@@ -26,8 +28,8 @@ import kotlinx.coroutines.launch
 import ru.pl.astronomypictureoftheday.R
 import ru.pl.astronomypictureoftheday.databinding.FragmentPhotoDetailsBinding
 import ru.pl.astronomypictureoftheday.model.PhotoEntity
-import ru.pl.astronomypictureoftheday.utils.ImageManager
-import ru.pl.astronomypictureoftheday.utils.toDefaultFormattedDate
+import ru.pl.astronomypictureoftheday.utils.toast
+import java.io.File
 
 class PhotoDetailsFragment : Fragment() {
 
@@ -48,6 +50,9 @@ class PhotoDetailsFragment : Fragment() {
         ActivityResultContracts.RequestPermission()
     ) { permissionGranted ->
         if (permissionGranted) {
+            if (!hasConnection()) {
+                toast(getString(R.string.no_internet_message))
+            }
             photoDetailsViewModel.saveImageToPictureFolder()
         }
     }
@@ -87,6 +92,13 @@ class PhotoDetailsFragment : Fragment() {
         _binding = null
     }
 
+    private fun hasConnection(): Boolean {
+        val connectivityManager = requireContext()
+            .getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        val networkInfo = connectivityManager.activeNetworkInfo
+        TODO("Доделать проверку наличия инета")
+    }
+
     private fun collectUiState() {
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
@@ -104,15 +116,11 @@ class PhotoDetailsFragment : Fragment() {
             descriptionDetail.justificationMode = Layout.JUSTIFICATION_MODE_INTER_WORD
             descriptionDetail.text = photoEntity.explanation
 
-            val filePath =
-                ImageManager().getInternalImageFullPathFile(
-                    photoEntity.title,
-                    requireContext().filesDir
-                )
+            val path = photoEntity.cachePhotoPath
             Glide.with(root.context)
                 .load(
-                    if (filePath.exists())
-                        BitmapFactory.decodeFile(filePath.absolutePath)
+                    if (File(path).exists())
+                        BitmapFactory.decodeFile(path)
                     else
                         photoEntity.imageUrl
                 )
@@ -124,7 +132,7 @@ class PhotoDetailsFragment : Fragment() {
                 })
                 .into(imageDetail)
 
-            dateDetail.text = photoEntity.date.toDefaultFormattedDate()
+            dateDetail.text = photoEntity.formattedDate
         }
     }
 

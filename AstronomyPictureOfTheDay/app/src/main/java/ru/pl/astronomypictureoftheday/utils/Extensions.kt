@@ -12,11 +12,6 @@ import ru.pl.astronomypictureoftheday.R
 import java.text.SimpleDateFormat
 import java.util.*
 
-fun Date.toDefaultFormattedDate(): String {
-    val sdf = SimpleDateFormat("dd.MM.yyyy", Locale.getDefault())
-    return sdf.format(this)
-}
-
 fun Fragment.toast(text: String) {
     Toast.makeText(requireContext(), text, Toast.LENGTH_SHORT).show()
 }

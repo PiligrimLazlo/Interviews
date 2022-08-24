@@ -13,7 +13,7 @@ data class PhotoDbModel(
     val imageUrl: String,
     val imageHdUrl: String = "",
     var isFavourite: Boolean = false,
-    val localPhotoPath: String = ""
+    val cachePhotoPath: String = ""
 ) {
 
 }

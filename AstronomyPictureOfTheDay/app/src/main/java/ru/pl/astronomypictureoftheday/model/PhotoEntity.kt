@@ -5,15 +5,16 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.squareup.moshi.Json
 import kotlinx.parcelize.Parcelize
+import java.text.SimpleDateFormat
 import java.util.*
 
 @Parcelize
 data class PhotoEntity(
-    val date: Date,
+    val formattedDate: String,
     val title: String,
     val explanation: String,
     val imageUrl: String,
     val imageHdUrl: String = "",
     var isFavourite: Boolean = false,
-    val localPhotoPath: String = ""
+    val cachePhotoPath: String = ""
 ): Parcelable

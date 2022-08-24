@@ -1,5 +1,6 @@
 package ru.pl.astronomypictureoftheday.model.repositories
 
+import android.content.Context
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
@@ -18,7 +19,7 @@ import ru.pl.astronomypictureoftheday.model.api.TopPhotoApi
 import ru.pl.astronomypictureoftheday.model.api.TopPhotoPagingSource
 import ru.pl.astronomypictureoftheday.utils.JsonDateAdapter
 
-class NetPhotoRepository {
+class NetPhotoRepository private constructor() {
     //todo передавать в конструкторе
     private val topPhotoApi: TopPhotoApi by lazy {
         val moshiBuilder = Moshi.Builder().add(JsonDateAdapter())
@@ -54,7 +55,24 @@ class NetPhotoRepository {
             }
     }
 
-    private companion object {
+    suspend fun fetchPhoto(): PhotoEntity = mapper.dtoToEntityPhoto(topPhotoApi.fetchTopPhoto())
+
+
+    companion object {
+
+        private var INSTANCE: NetPhotoRepository? = null
+
         const val PAGE_SIZE = 30
+
+        fun initialize() {
+            if (INSTANCE == null) {
+                INSTANCE = NetPhotoRepository()
+            }
+        }
+
+        fun get(): NetPhotoRepository {
+            return INSTANCE
+                ?: throw IllegalStateException("NetPhotoRepository must be initialized")
+        }
     }
 }

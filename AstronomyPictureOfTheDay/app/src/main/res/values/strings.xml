@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">AstronomyPictureOfTheDay</string>
+    <string name="app_name">Picture Of The Day</string>
     <string name="top_photo_image_description">Top Photo Image</string>
     <string name="dark_mode">Dark mode</string>
     <string name="binding_null_error">Cannot access binding because it is null. Is the view visible?</string>
@@ -17,4 +17,7 @@
     <string name="photos">All photos</string>
     <string name="favourites">Favourites</string>
     <string name="downloading_failed">Downloading failed</string>
+    <string name="no_internet_message">This operation requires internet</string>
+    <string name="black_theme">Black theme</string>
+    <string name="switch_set_wallpaper">New wallpapers every day</string>
 </resources>

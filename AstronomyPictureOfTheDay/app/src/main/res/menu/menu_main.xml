@@ -6,4 +6,9 @@
         android:title="@string/dark_mode"
         android:actionLayout="@layout/switch_dark_mode"
         app:showAsAction="always"/>
+
+    <item
+        android:id="@+id/switch_set_wallpaper"
+        android:checkable="true"
+        android:title="@string/switch_set_wallpaper" />
 </menu>
