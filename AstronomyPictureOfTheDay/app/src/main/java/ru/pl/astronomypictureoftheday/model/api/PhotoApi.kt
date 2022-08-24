@@ -8,13 +8,13 @@ private const val API_KEY = "g2i26rNZnPGzrK7pV62jkvSwj3aKPwojszearVQ3"
 interface TopPhotoApi {
 
     @GET("apod?api_key=$API_KEY")
-    suspend fun fetchTopPhotos(): TopPhotoResponse
+    suspend fun fetchTopPhotos(): PhotoDto
 
     @GET("apod?api_key=$API_KEY")
     suspend fun fetchTopPhotos(
         @Query("start_date") startDate: String,
         @Query("end_date") endDate: String,
-    ): List<TopPhotoResponse>
+    ): List<PhotoDto>
 
 
 }

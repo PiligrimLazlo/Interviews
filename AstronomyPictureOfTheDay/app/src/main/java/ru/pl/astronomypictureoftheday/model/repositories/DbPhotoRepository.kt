@@ -4,17 +4,17 @@ import android.content.Context
 import androidx.room.Room
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
-import ru.pl.astronomypictureoftheday.model.FavouritePhoto
+import ru.pl.astronomypictureoftheday.model.PhotoEntity
 import ru.pl.astronomypictureoftheday.model.PhotoMapper
-import ru.pl.astronomypictureoftheday.model.room.SavedPhotoDatabase
+import ru.pl.astronomypictureoftheday.model.room.PhotoDatabase
 
 class DbPhotoRepository private constructor(context: Context) {
 
     //todo передавать в конструкторе
-    private val database: SavedPhotoDatabase by lazy {
+    private val database: PhotoDatabase by lazy {
         Room.databaseBuilder(
                 context.applicationContext,
-                SavedPhotoDatabase::class.java,
+                PhotoDatabase::class.java,
                 "saved_photo_db"
             )
             .fallbackToDestructiveMigration()
@@ -22,35 +22,35 @@ class DbPhotoRepository private constructor(context: Context) {
     }
     private val mapper: PhotoMapper = PhotoMapper()
 
-    fun getFavouritePhotos(): Flow<List<FavouritePhoto>>  =
-        database.savedPhotoDao().getPhotos().map {
-            mapper.savedPhotoListToFavouritePhotoList(it)
+    fun getPhotos(): Flow<List<PhotoEntity>>  =
+        database.photoDao().getPhotos().map {
+            mapper.dbModelToEntityPhotoList(it)
         }
 
-    suspend fun getFavouritePhoto(id: Int): FavouritePhoto? {
-        val savedPhoto = database.savedPhotoDao().getPhoto(id) ?: return null
-        return mapper.savedToFavouritePhoto(savedPhoto)
+    suspend fun getPhoto(id: Int): PhotoEntity? {
+        val savedPhoto = database.photoDao().getPhoto(id) ?: return null
+        return mapper.dbModelToEntityPhoto(savedPhoto)
     }
 
-    suspend fun getFavouritePhoto(title: String): FavouritePhoto? {
-        val savedPhoto = database.savedPhotoDao().getPhoto(title) ?: return null
-        return mapper.savedToFavouritePhoto(savedPhoto)
+    suspend fun getPhoto(title: String): PhotoEntity? {
+        val savedPhoto = database.photoDao().getPhoto(title) ?: return null
+        return mapper.dbModelToEntityPhoto(savedPhoto)
     }
 
-    suspend fun updateFavouritePhoto(favouritePhoto: FavouritePhoto) {
-        database.savedPhotoDao().updatePhoto(mapper.favouriteToSavedPhoto(favouritePhoto))
+    suspend fun updatePhoto(photoEntity: PhotoEntity) {
+        database.photoDao().updatePhoto(mapper.entityToDbModelPhoto(photoEntity))
     }
 
-    suspend fun addFavouritePhoto(favouritePhoto: FavouritePhoto) {
-        database.savedPhotoDao().addPhoto(mapper.favouriteToSavedPhoto(favouritePhoto))
+    suspend fun addPhoto(photoEntity: PhotoEntity) {
+        database.photoDao().addPhoto(mapper.entityToDbModelPhoto(photoEntity))
     }
 
-    suspend fun deleteFavouritePhoto(favouritePhoto: FavouritePhoto) {
-        database.savedPhotoDao().deletePhoto(mapper.favouriteToSavedPhoto(favouritePhoto))
+    suspend fun deletePhoto(photoEntity: PhotoEntity) {
+        database.photoDao().deletePhoto(mapper.entityToDbModelPhoto(photoEntity))
     }
 
-    suspend fun deleteFavouritePhoto(title: String) {
-        database.savedPhotoDao().deletePhoto(title)
+    suspend fun deletePhoto(title: String) {
+        database.photoDao().deletePhoto(title)
     }
 
 

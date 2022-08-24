@@ -5,9 +5,9 @@ import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import ru.pl.astronomypictureoftheday.utils.RoomDateAdapter
 
-@Database(version = 1, entities = [SavedPhotoDbEntity::class], exportSchema = false)
+@Database(version = 1, entities = [PhotoDbModel::class], exportSchema = false)
 @TypeConverters(RoomDateAdapter::class)
-abstract class SavedPhotoDatabase : RoomDatabase() {
+abstract class PhotoDatabase : RoomDatabase() {
 
-    abstract fun savedPhotoDao(): SavedPhotoDao
+    abstract fun photoDao(): PhotoDbDao
 }

@@ -24,8 +24,8 @@
         android:label="PhotoDetailsFragment"
         tools:layout="@layout/fragment_photo_details">
         <argument
-            android:name="favouritePhoto"
-            app:argType="ru.pl.astronomypictureoftheday.model.FavouritePhoto" />
+            android:name="photoEntity"
+            app:argType="ru.pl.astronomypictureoftheday.model.PhotoEntity" />
         <argument
             android:name="title"
             app:argType="string" />

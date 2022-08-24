@@ -13,7 +13,6 @@ import androidx.recyclerview.widget.GridLayoutManager
 import kotlinx.coroutines.launch
 import ru.pl.astronomypictureoftheday.R
 import ru.pl.astronomypictureoftheday.databinding.FragmentFavouritesBinding
-import ru.pl.astronomypictureoftheday.databinding.FragmentPhotoDetailsBinding
 import ru.pl.astronomypictureoftheday.view.adapters.PhotoListFavouritesAdapter
 
 class FavouritesFragment : Fragment() {
@@ -48,7 +47,7 @@ class FavouritesFragment : Fragment() {
 
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                favouritesViewModel.favouritePhotos.collect {
+                favouritesViewModel.photosEntity.collect {
                     val list = it
                     adapter.submitList(list)
                 }

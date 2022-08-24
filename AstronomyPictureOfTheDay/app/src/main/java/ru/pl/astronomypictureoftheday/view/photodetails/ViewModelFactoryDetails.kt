@@ -3,14 +3,12 @@ package ru.pl.astronomypictureoftheday.view.photodetails
 import android.app.Application
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import ru.pl.astronomypictureoftheday.TopPhotoApplication
-import ru.pl.astronomypictureoftheday.model.FavouritePhoto
-import ru.pl.astronomypictureoftheday.view.photolist.PhotoListViewModel
+import ru.pl.astronomypictureoftheday.model.PhotoEntity
 
 
 class ViewModelFactoryDetails(
     private val application: Application,
-    private val photo: FavouritePhoto
+    private val photo: PhotoEntity
 ): ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(PhotoDetailsViewModel::class.java)) {

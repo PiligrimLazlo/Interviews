@@ -1,25 +1,17 @@
 package ru.pl.astronomypictureoftheday.view.adapters
 
-import android.util.Log
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageButton
-import android.widget.ImageView
-import android.widget.TextView
 import androidx.paging.PagingDataAdapter
-import androidx.recyclerview.widget.DiffUtil
-import androidx.recyclerview.widget.RecyclerView
-import com.bumptech.glide.Glide
 import ru.pl.astronomypictureoftheday.R
-import ru.pl.astronomypictureoftheday.model.FavouritePhoto
+import ru.pl.astronomypictureoftheday.model.PhotoEntity
 
 private const val TAG = "PhotoListPagingAdapter"
 
 class PhotoListPagingAdapter(
-    private val onPhotoClickListener: (FavouritePhoto) -> Unit,
-    private val onSaveButtonPressedListener: (FavouritePhoto) -> Unit,
-) : PagingDataAdapter<FavouritePhoto, PhotoViewHolder>(PhotoComparator()) {
+    private val onPhotoClickListener: (PhotoEntity) -> Unit,
+    private val onSaveButtonPressedListener: (PhotoEntity) -> Unit,
+) : PagingDataAdapter<PhotoEntity, PhotoViewHolder>(PhotoComparator()) {
 
     //НЕ через binding (для разнообразия)
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PhotoViewHolder {

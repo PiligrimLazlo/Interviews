@@ -4,25 +4,25 @@ import androidx.room.*
 import kotlinx.coroutines.flow.Flow
 
 @Dao
-interface SavedPhotoDao {
+interface PhotoDbDao {
 
     @Query("SELECT * FROM saved_photo_table")
-    fun getPhotos(): Flow<List<SavedPhotoDbEntity>>
+    fun getPhotos(): Flow<List<PhotoDbModel>>
 
     @Query("SELECT * FROM saved_photo_table WHERE id=:id")
-    suspend fun getPhoto(id: Int): SavedPhotoDbEntity?
+    suspend fun getPhoto(id: Int): PhotoDbModel?
 
     @Query("SELECT * FROM saved_photo_table WHERE title=:title")
-    suspend fun getPhoto(title: String): SavedPhotoDbEntity?
+    suspend fun getPhoto(title: String): PhotoDbModel?
 
     @Update
-    suspend fun updatePhoto(savedPhotoDbEntity: SavedPhotoDbEntity)
+    suspend fun updatePhoto(photoDbModel: PhotoDbModel)
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun addPhoto(savedPhotoDbEntity: SavedPhotoDbEntity)
+    suspend fun addPhoto(photoDbModel: PhotoDbModel)
 
     @Delete
-    suspend fun deletePhoto(savedPhotoDbEntity: SavedPhotoDbEntity)
+    suspend fun deletePhoto(photoDbModel: PhotoDbModel)
 
     @Query ("DELETE FROM saved_photo_table WHERE title=:title")
     suspend fun deletePhoto(title: String)

@@ -6,12 +6,10 @@ import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.view.MenuProvider
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.setFragmentResultListener
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
-import androidx.navigation.fragment.findNavController
 import androidx.paging.LoadState
 import androidx.recyclerview.widget.GridLayoutManager
 import com.google.android.material.switchmaterial.SwitchMaterial
@@ -87,12 +85,7 @@ class PhotoListFragment : Fragment() {
             } else {
                 toast("\"${it.title}\" ${getString(R.string.removed_from_favourites)}")
             }
-            photoListViewModel.onSaveFavouriteButtonPressed(
-                it,
-                ImageManager().getInternalImageFullPathFile(
-                    it.title, requireContext().filesDir
-                )
-            )
+            photoListViewModel.onSaveFavouriteButtonPressed(it, requireContext().filesDir)
         })
     }
 
@@ -108,7 +101,7 @@ class PhotoListFragment : Fragment() {
     private fun collectAdapterData(pagingAdapter: PhotoListPagingAdapter) {
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                photoListViewModel.favouritePhotoItemsFromPaging.collectLatest {
+                photoListViewModel.photoEntityItemsFromPaging.collectLatest {
                     pagingAdapter.submitData(it)
                 }
             }

@@ -4,13 +4,12 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.ListAdapter
 import ru.pl.astronomypictureoftheday.R
-import ru.pl.astronomypictureoftheday.databinding.FragmentFavouritesBinding
-import ru.pl.astronomypictureoftheday.model.FavouritePhoto
+import ru.pl.astronomypictureoftheday.model.PhotoEntity
 
 class PhotoListFavouritesAdapter(
-    private val onPhotoClickListener: (FavouritePhoto) -> Unit,
-    private val onSaveButtonPressedListener: (FavouritePhoto) -> Unit,
-) : ListAdapter<FavouritePhoto, PhotoViewHolder>(PhotoComparator()) {
+    private val onPhotoClickListener: (PhotoEntity) -> Unit,
+    private val onSaveButtonPressedListener: (PhotoEntity) -> Unit,
+) : ListAdapter<PhotoEntity, PhotoViewHolder>(PhotoComparator()) {
 
     //через binding не получится, т.к. в ViewHolder через findViewById
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PhotoViewHolder {

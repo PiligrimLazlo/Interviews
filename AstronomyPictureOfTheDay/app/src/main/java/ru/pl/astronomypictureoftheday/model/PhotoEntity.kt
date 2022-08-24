@@ -1,12 +1,14 @@
-package ru.pl.astronomypictureoftheday.model.room
+package ru.pl.astronomypictureoftheday.model
 
+import android.os.Parcelable
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import com.squareup.moshi.Json
+import kotlinx.parcelize.Parcelize
 import java.util.*
 
-@Entity(tableName = "saved_photo_table")
-data class SavedPhotoDbEntity(
-    @PrimaryKey(autoGenerate = true) val id: Int = 0,
+@Parcelize
+data class PhotoEntity(
     val date: Date,
     val title: String,
     val explanation: String,
@@ -14,6 +16,4 @@ data class SavedPhotoDbEntity(
     val imageHdUrl: String = "",
     var isFavourite: Boolean = false,
     val localPhotoPath: String = ""
-) {
-
-}
+): Parcelable

@@ -11,7 +11,7 @@ import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import ru.pl.astronomypictureoftheday.model.repositories.PreferencesRepository
 import ru.pl.astronomypictureoftheday.model.repositories.PreferencesRepository.Companion.THEME_LIGHT
-import ru.pl.astronomypictureoftheday.model.FavouritePhoto
+import ru.pl.astronomypictureoftheday.model.PhotoEntity
 import ru.pl.astronomypictureoftheday.model.repositories.NetPhotoRepository
 import ru.pl.astronomypictureoftheday.model.repositories.DbPhotoRepository
 import ru.pl.astronomypictureoftheday.utils.ImageManager
@@ -29,7 +29,7 @@ class PhotoListViewModel : ViewModel() {
     val uiState: StateFlow<PhotoListUiState>
         get() = _uiState.asStateFlow()
 
-    val favouritePhotoItemsFromPaging: Flow<PagingData<FavouritePhoto>>
+    val photoEntityItemsFromPaging: Flow<PagingData<PhotoEntity>>
 
     private val imageManager: ImageManager = ImageManager()
 
@@ -39,16 +39,16 @@ class PhotoListViewModel : ViewModel() {
         //собираем сохр избранные фотки из репозитория БД
         collectSavedPhotos()
         //при первой загрузке подменяем айтемы
-        favouritePhotoItemsFromPaging = collectInfPhotoList()
+        photoEntityItemsFromPaging = collectInfPhotoList()
     }
 
-    private fun collectInfPhotoList(): Flow<PagingData<FavouritePhoto>> {
+    private fun collectInfPhotoList(): Flow<PagingData<PhotoEntity>> {
         return netPhotoRepository
-            .fetchTopPhotos()
+            .fetchPhotos()
             .map {
                 it.map { oldFavPhoto ->
                     val newFavPhoto =
-                        _uiState.value.favouritePhotosList.find { favouritePhoto ->
+                        _uiState.value.photosListEntity.find { favouritePhoto ->
                             favouritePhoto.title == oldFavPhoto.title
                         }
                     newFavPhoto ?: oldFavPhoto
@@ -59,9 +59,9 @@ class PhotoListViewModel : ViewModel() {
 
     private fun collectSavedPhotos() {
         viewModelScope.launch {
-            dbPhotoRepository.getFavouritePhotos().collectLatest { newFavPhotoList ->
+            dbPhotoRepository.getPhotos().collectLatest { newFavPhotoList ->
                 _uiState.update {
-                    it.copy(favouritePhotosList = newFavPhotoList)
+                    it.copy(photosListEntity = newFavPhotoList)
                 }
             }
         }
@@ -87,12 +87,12 @@ class PhotoListViewModel : ViewModel() {
         }
     }
 
-    fun onSaveFavouriteButtonPressed(photo: FavouritePhoto, filePath: File) {
+    fun onSaveFavouriteButtonPressed(photo: PhotoEntity, filesDir: File) {
         viewModelScope.launch(Dispatchers.IO) {
-            //todo localPhotoPath - где-то взять
             //сохраняем запись в базу и фото в кэш
-            if (dbPhotoRepository.getFavouritePhoto(photo.title) == null) {
-                dbPhotoRepository.addFavouritePhoto(
+            val filePath = imageManager.getInternalImageFullPathFile(photo.title, filesDir)
+            if (dbPhotoRepository.getPhoto(photo.title) == null) {
+                dbPhotoRepository.addPhoto(
                     photo.copy(
                         isFavourite = true,
                         localPhotoPath = filePath.absolutePath
@@ -100,7 +100,7 @@ class PhotoListViewModel : ViewModel() {
                 )
             imageManager.savePhoto(photo.imageUrl, filePath)
             } else {
-                dbPhotoRepository.deleteFavouritePhoto(photo.title)
+                dbPhotoRepository.deletePhoto(photo.title)
                 imageManager.deletePhoto(filePath)
             }
         }
@@ -111,5 +111,5 @@ class PhotoListViewModel : ViewModel() {
 
 data class PhotoListUiState(
     val theme: Int = THEME_LIGHT,
-    val favouritePhotosList: List<FavouritePhoto> = emptyList()
+    val photosListEntity: List<PhotoEntity> = emptyList()
 )

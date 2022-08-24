@@ -2,12 +2,6 @@ package ru.pl.astronomypictureoftheday.view.photodetails
 
 import android.app.Application
 import android.app.WallpaperManager
-import android.content.res.Resources
-import android.graphics.Bitmap
-import android.graphics.BitmapFactory
-import android.graphics.Point
-import android.graphics.Rect
-import androidx.core.graphics.scale
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.Dispatchers
@@ -16,17 +10,14 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import ru.pl.astronomypictureoftheday.R
-import ru.pl.astronomypictureoftheday.model.FavouritePhoto
+import ru.pl.astronomypictureoftheday.model.PhotoEntity
 import ru.pl.astronomypictureoftheday.utils.ImageManager
-import java.io.FileOutputStream
-import java.net.URL
 
 private const val TAG = "PhotoDetailsViewModel"
 
 class PhotoDetailsViewModel(
     private val application: Application,
-    private val photo: FavouritePhoto
+    private val photo: PhotoEntity
 ) : ViewModel() {
     private val _detailsState: MutableStateFlow<PhotoDetailsState> =
         MutableStateFlow(PhotoDetailsState())

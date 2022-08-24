@@ -12,7 +12,7 @@ import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
 import retrofit2.create
-import ru.pl.astronomypictureoftheday.model.FavouritePhoto
+import ru.pl.astronomypictureoftheday.model.PhotoEntity
 import ru.pl.astronomypictureoftheday.model.PhotoMapper
 import ru.pl.astronomypictureoftheday.model.api.TopPhotoApi
 import ru.pl.astronomypictureoftheday.model.api.TopPhotoPagingSource
@@ -37,7 +37,7 @@ class NetPhotoRepository {
 
 
     //for paging lib
-    fun fetchTopPhotos(): Flow<PagingData<FavouritePhoto>> {
+    fun fetchPhotos(): Flow<PagingData<PhotoEntity>> {
         return Pager(
             config = PagingConfig(
                 pageSize = PAGE_SIZE,
@@ -49,7 +49,7 @@ class NetPhotoRepository {
         ).flow
             .map { pagingData ->
                 pagingData.map { topPhotoResponse ->
-                    mapper.responseToFavouritePhoto(topPhotoResponse)
+                    mapper.dtoToEntityPhoto(topPhotoResponse)
                 }
             }
     }

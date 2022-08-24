@@ -3,8 +3,6 @@ package ru.pl.astronomypictureoftheday.model.api
 import android.util.Log
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
-import ru.pl.astronomypictureoftheday.model.api.TopPhotoApi
-import ru.pl.astronomypictureoftheday.model.api.TopPhotoResponse
 import ru.pl.astronomypictureoftheday.utils.SERVER_DATE_FORMAT
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
@@ -14,15 +12,15 @@ private const val TAG = "TopPhotoPagingSource"
 
 class TopPhotoPagingSource(
     private val topPhotoApi: TopPhotoApi
-) : PagingSource<Int, TopPhotoResponse>() {
-    override suspend fun load(params: LoadParams<Int>): LoadResult<Int, TopPhotoResponse> {
+) : PagingSource<Int, PhotoDto>() {
+    override suspend fun load(params: LoadParams<Int>): LoadResult<Int, PhotoDto> {
         return try {
             val pageIndex = params.key ?: 1
 
             val period = getPeriod(params.loadSize, pageIndex)
             //переводит TopPhotoResponse в FavouritePhoto,
             // далее если есть запись в БД, заменяем в списке
-            val favouritePhotoList: List<TopPhotoResponse> = topPhotoApi
+            val favouritePhotoList: List<PhotoDto> = topPhotoApi
                 .fetchTopPhotos(period.first, period.second)
                 .reversed()
             Log.d(TAG, "${period.first} : ${period.second} -> pageIndex: $pageIndex")
@@ -37,7 +35,7 @@ class TopPhotoPagingSource(
         }
     }
 
-    override fun getRefreshKey(state: PagingState<Int, TopPhotoResponse>): Int? {
+    override fun getRefreshKey(state: PagingState<Int, PhotoDto>): Int? {
         // get the most recently accessed index in the users list:
         val anchorPosition = state.anchorPosition ?: return null
         // convert item index to page index:

@@ -25,7 +25,7 @@ import com.bumptech.glide.request.target.Target
 import kotlinx.coroutines.launch
 import ru.pl.astronomypictureoftheday.R
 import ru.pl.astronomypictureoftheday.databinding.FragmentPhotoDetailsBinding
-import ru.pl.astronomypictureoftheday.model.FavouritePhoto
+import ru.pl.astronomypictureoftheday.model.PhotoEntity
 import ru.pl.astronomypictureoftheday.utils.ImageManager
 import ru.pl.astronomypictureoftheday.utils.toDefaultFormattedDate
 
@@ -38,10 +38,10 @@ class PhotoDetailsFragment : Fragment() {
         }
 
     private val photoDetailsViewModel: PhotoDetailsViewModel by viewModels {
-        ViewModelFactoryDetails(requireActivity().application, favouritePhoto)
+        ViewModelFactoryDetails(requireActivity().application, photoEntity)
     }
     private val args: PhotoDetailsFragmentArgs by navArgs()
-    private lateinit var favouritePhoto: FavouritePhoto
+    private lateinit var photoEntity: PhotoEntity
 
     //ask write in memory permission
     private val requestWriteInMemoryPermissionLauncher = registerForActivityResult(
@@ -54,7 +54,7 @@ class PhotoDetailsFragment : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        favouritePhoto = args.favouritePhoto
+        photoEntity = args.photoEntity
     }
 
     override fun onCreateView(
@@ -102,11 +102,11 @@ class PhotoDetailsFragment : Fragment() {
 
         binding.apply {
             descriptionDetail.justificationMode = Layout.JUSTIFICATION_MODE_INTER_WORD
-            descriptionDetail.text = favouritePhoto.explanation
+            descriptionDetail.text = photoEntity.explanation
 
             val filePath =
                 ImageManager().getInternalImageFullPathFile(
-                    favouritePhoto.title,
+                    photoEntity.title,
                     requireContext().filesDir
                 )
             Glide.with(root.context)
@@ -114,7 +114,7 @@ class PhotoDetailsFragment : Fragment() {
                     if (filePath.exists())
                         BitmapFactory.decodeFile(filePath.absolutePath)
                     else
-                        favouritePhoto.imageUrl
+                        photoEntity.imageUrl
                 )
                 .placeholder(R.drawable.placeholder_400x400)
                 .error(R.drawable.error_400x400)
@@ -124,7 +124,7 @@ class PhotoDetailsFragment : Fragment() {
                 })
                 .into(imageDetail)
 
-            dateDetail.text = favouritePhoto.date.toDefaultFormattedDate()
+            dateDetail.text = photoEntity.date.toDefaultFormattedDate()
         }
     }
 
