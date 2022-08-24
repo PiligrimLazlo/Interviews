@@ -62,7 +62,7 @@ class NetPhotoRepository private constructor() {
 
         private var INSTANCE: NetPhotoRepository? = null
 
-        const val PAGE_SIZE = 30
+        const val PAGE_SIZE = 15
 
         fun initialize() {
             if (INSTANCE == null) {

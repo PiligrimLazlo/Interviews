@@ -25,8 +25,13 @@ class WallpaperWorker(
         val bitmap = imageManager.loadPhotoFromCache(filePath)
             ?: imageManager.loadBitmapFromNet(photo.imageHdUrl)
             ?: return Result.failure()
-        val rect = imageManager.scaleBitmapForWallpapers(bitmap)
-        wallpaperManager.setBitmap(bitmap, rect, false)
+        val scaledImageData = imageManager.scaleBitmapForWallpapers(bitmap)
+        wallpaperManager.setBitmap(
+            scaledImageData.bitmap,
+            scaledImageData.rect,
+            false,
+            WallpaperManager.FLAG_LOCK or WallpaperManager.FLAG_SYSTEM
+        )
 
         return Result.success()
     }

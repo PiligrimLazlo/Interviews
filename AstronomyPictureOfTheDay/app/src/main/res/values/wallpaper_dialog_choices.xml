@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <array name="choices">
+        <item>@string/wallpapers_choice_home_screen</item>
+        <item>@string/wallpapers_choice_lock_screen</item>
+        <item>@string/wallpapers_choice_both_screens</item>
+    </array>
+</resources>

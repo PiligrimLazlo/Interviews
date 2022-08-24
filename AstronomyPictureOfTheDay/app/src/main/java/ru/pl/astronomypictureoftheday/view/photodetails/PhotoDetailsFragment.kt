@@ -2,10 +2,8 @@ package ru.pl.astronomypictureoftheday.view.photodetails
 
 import android.Manifest
 import android.annotation.SuppressLint
-import android.content.Context
 import android.graphics.BitmapFactory
 import android.graphics.drawable.Drawable
-import android.net.ConnectivityManager
 import android.os.Bundle
 import android.text.Layout
 import android.view.LayoutInflater
@@ -50,9 +48,6 @@ class PhotoDetailsFragment : Fragment() {
         ActivityResultContracts.RequestPermission()
     ) { permissionGranted ->
         if (permissionGranted) {
-            if (!hasConnection()) {
-                toast(getString(R.string.no_internet_message))
-            }
             photoDetailsViewModel.saveImageToPictureFolder()
         }
     }
@@ -83,20 +78,15 @@ class PhotoDetailsFragment : Fragment() {
             requestWriteInMemoryPermission()
         }
         binding.setWallpapersBtn.setOnClickListener {
-            photoDetailsViewModel.setWallpapers()
+            showWallpaperDialog { position ->
+                photoDetailsViewModel.setWallpapers(position)
+            }
         }
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
-    }
-
-    private fun hasConnection(): Boolean {
-        val connectivityManager = requireContext()
-            .getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-        val networkInfo = connectivityManager.activeNetworkInfo
-        TODO("Доделать проверку наличия инета")
     }
 
     private fun collectUiState() {
@@ -154,9 +144,23 @@ class PhotoDetailsFragment : Fragment() {
             .setTitle(title)
             .setCancelable(false)
             .setPositiveButton(
-                "OK"
+                getString(R.string.ok)
             ) { dialog, _ ->
                 dialog.dismiss()
+            }
+            .create()
+            .show()
+    }
+
+    private fun showWallpaperDialog(clickListener: (Int) -> Unit) {
+        AlertDialog.Builder(requireContext(), R.style.AlertDialogCustom)
+            .setTitle(R.string.set_wallpapers_text)
+            .setCancelable(true)
+            .setNegativeButton(getString(R.string.cancel)) { dialog, _ ->
+                dialog.dismiss()
+            }
+            .setItems(R.array.choices) { _, which ->
+                clickListener(which)
             }
             .create()
             .show()
@@ -171,8 +175,6 @@ class PhotoDetailsFragment : Fragment() {
             } else {
                 setWallpapersBtn.visibility = View.VISIBLE
                 progressBarWallpapers.visibility = View.INVISIBLE
-                //todo fix
-                //toast(getString(R.string.wallpapers_set))
             }
             if (state.isSavingPhoto) {
                 saveToGalleryBtn.visibility = View.INVISIBLE
@@ -180,10 +182,9 @@ class PhotoDetailsFragment : Fragment() {
             } else {
                 saveToGalleryBtn.visibility = View.VISIBLE
                 progressBarSave.visibility = View.INVISIBLE
-                //todo fix
-                //toast(getString(R.string.picture_saved))
             }
-
+            state.userMessage?.let { toast(it) }
+            photoDetailsViewModel.userMessageShown()
         }
     }
 }

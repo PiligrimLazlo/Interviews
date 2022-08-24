@@ -18,8 +18,7 @@ class TopPhotoPagingSource(
             val pageIndex = params.key ?: 1
 
             val period = getPeriod(params.loadSize, pageIndex)
-            //переводит TopPhotoResponse в FavouritePhoto,
-            // далее если есть запись в БД, заменяем в списке
+
             val favouritePhotoList: List<PhotoDto> = topPhotoApi
                 .fetchTopPhotos(period.first, period.second)
                 .reversed()

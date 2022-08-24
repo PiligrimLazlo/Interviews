@@ -15,8 +15,7 @@ class ImageManager {
 
     //user's saved photos
     fun getPublicImageFullPathFile(title: String): File {
-        val formattedTitle = title.replace(Regex("[: ]"), "")
-        val fileName = "NasaAPOD_$formattedTitle.jpg"
+        val fileName = getFormattedFileName(title)
         return File(
             Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES),
             fileName
@@ -25,12 +24,16 @@ class ImageManager {
 
     //room caches photos
     fun getInternalImageFullPathFile(title: String, filesDir: File): File {
-        val formattedTitle = title.replace(Regex("[: ]"), "")
-        val fileName = "NasaAPOD_$formattedTitle.jpg"
+        val fileName = getFormattedFileName(title)
         return File(filesDir, fileName)
     }
 
-    fun savePhoto(urlSource: String, absPathToSave: File) {
+    private fun getFormattedFileName(title: String): String {
+        val formattedTitle = title.replace(Regex("[: ]"), "")
+        return "NasaAPOD_$formattedTitle.jpg"
+    }
+
+    fun savePhoto(urlSource: String, absPathToSave: File): Bitmap? {
         var bitmap = loadPhotoFromCache(absPathToSave)
         if (bitmap == null) {
             bitmap = loadBitmapFromNet(urlSource)
@@ -39,7 +42,7 @@ class ImageManager {
                     bitmap.compress(Bitmap.CompressFormat.JPEG, 80, it)
                 }
         }
-
+        return bitmap
     }
 
     fun deletePhoto(absPathToSave: File) {
@@ -69,7 +72,7 @@ class ImageManager {
         }
     }
 
-    fun scaleBitmapForWallpapers(bitmap: Bitmap): Rect {
+    fun scaleBitmapForWallpapers(bitmap: Bitmap): ScaledImageData {
         var bitmapScaled = bitmap
         val wallpaperHeight = Resources.getSystem().displayMetrics.heightPixels
         val wallpaperWidth = Resources.getSystem().displayMetrics.widthPixels
@@ -78,12 +81,12 @@ class ImageManager {
         val heightFactor = wallpaperHeight.toDouble() / bitmapScaled.height
         //scale (grow) bitmap if it smaller than screen
         if (bitmapScaled.width < wallpaperWidth || bitmapScaled.height < wallpaperHeight) {
-            bitmapScaled = if (widthFactor > heightFactor) {
+            if (widthFactor > heightFactor) {
                 val newBitmapHeight = (bitmapScaled.height * widthFactor).toInt()
-                bitmapScaled.scale(wallpaperWidth, newBitmapHeight, false)
+                bitmapScaled = bitmapScaled.scale(wallpaperWidth, newBitmapHeight, false)
             } else {
                 val newBitmapWidth = (bitmapScaled.width * heightFactor).toInt()
-                bitmapScaled.scale(newBitmapWidth, wallpaperHeight, false)
+                bitmapScaled = bitmapScaled.scale(newBitmapWidth, wallpaperHeight, false)
             }
         }
         //center cropping big image
@@ -98,7 +101,11 @@ class ImageManager {
             start.y = (bitmapScaled.height - wallpaperHeight) / 2
             end.y = start.y + wallpaperHeight
         }
-        return Rect(start.x, start.y, end.x, end.y)
+        return ScaledImageData(bitmapScaled, Rect(start.x, start.y, end.x, end.y))
     }
-
 }
+
+data class ScaledImageData(
+    val bitmap: Bitmap,
+    val rect: Rect
+)

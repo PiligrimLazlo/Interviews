@@ -107,21 +107,7 @@ class PhotoListFragment : Fragment() {
         )
     }
 
-//    private fun collectUiState() {
-//        viewLifecycleOwner.lifecycleScope.launch {
-//            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-//                photoListViewModel.uiState.collect { state ->
-//                    currentTheme = state.theme
-//                    val themeMode =
-//                        if (currentTheme == THEME_LIGHT)
-//                            AppCompatDelegate.MODE_NIGHT_NO
-//                        else
-//                            AppCompatDelegate.MODE_NIGHT_YES
-//                    AppCompatDelegate.setDefaultNightMode(themeMode)
-//                }
-//            }
-//        }
-//    }
+
 
 
     private fun setUpLayoutManager(): GridLayoutManager {
@@ -134,32 +120,6 @@ class PhotoListFragment : Fragment() {
         return layoutManger
     }
 
-//    private fun setUpMenu() {
-//        val menuHost = requireActivity()
-//        menuHost.addMenuProvider(object : MenuProvider {
-//            override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
-//                menuInflater.inflate(R.menu.menu_main, menu)
-//                val switchItem = menu.findItem(R.id.enable_dark_mode)
-//                switchItem.setActionView(R.layout.switch_dark_mode)
-//
-//                val switch: SwitchMaterial =
-//                    menu.findItem(R.id.enable_dark_mode).actionView.findViewById(R.id.switcher)
-//                switch.isChecked = currentTheme == THEME_DARK
-//
-//                switch.setOnCheckedChangeListener { _, isChecked ->
-//                    if (isChecked) {
-//                        photoListViewModel.setTheme(THEME_DARK)
-//                    } else {
-//                        photoListViewModel.setTheme(THEME_LIGHT)
-//                    }
-//                }
-//            }
-//
-//            override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
-//                return true
-//            }
-//
-//        }, requireActivity(), Lifecycle.State.STARTED)
-//    }
+
 
 }

@@ -5,12 +5,13 @@
     <string name="binding_null_error">Cannot access binding because it is null. Is the view visible?</string>
     <string name="retry">Retry</string>
     <string name="save_btn_text">Save To Gallery</string>
-    <string name="set_wallpapers_btn_text">Set Wallpapers</string>
+    <string name="set_wallpapers_text">Set Wallpapers</string>
     <string name="wallpapers_set">Wallpapers Set</string>
     <string name="successfully_saved_picture">"successfully saved in \"Pictures\" folder"</string>
     <string name="picture_saved">Picture saved</string>
     <string name="added_to_favourites">added to favourites</string>
     <string name="error">Error</string>
+    <string name="connection_error">Connection error</string>
     <string name="write_permission_not_granted_error">Write external storage permission did not received!</string>
     <string name="removed_from_favourites">removed from favourites</string>
     <string name="view_type_exception">View type must be 0 or 1</string>
@@ -20,4 +21,10 @@
     <string name="no_internet_message">This operation requires internet</string>
     <string name="black_theme">Black theme</string>
     <string name="switch_set_wallpaper">New wallpapers every day</string>
+    <string name="wallpapers_choice_home_screen">Home screen</string>
+    <string name="wallpapers_choice_lock_screen">Lock screen</string>
+    <string name="wallpapers_choice_both_screens">Both screens</string>
+    <string name="ok">OK</string>
+    <string name="cancel">Cancel</string>
+
 </resources>
