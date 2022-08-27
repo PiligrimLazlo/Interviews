@@ -6,7 +6,7 @@
     app:startDestination="@id/photoListFragment">
     <fragment
         android:id="@+id/photoListFragment"
-        android:name="ru.pl.astronomypictureoftheday.view.photolist.PhotoListFragment"
+        android:name="ru.pl.astronomypictureoftheday.presentation.fragments.PhotoListFragment"
         android:label="PhotoListFragment"
         tools:layout="@layout/fragment_photo_list"/>
 </navigation>

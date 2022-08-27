@@ -3,9 +3,7 @@ package ru.pl.astronomypictureoftheday.workers
 import android.app.WallpaperManager
 import android.content.Context
 import androidx.work.*
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
-import ru.pl.astronomypictureoftheday.model.repositories.NetPhotoRepository
+import ru.pl.astronomypictureoftheday.data.repositories.NetPhotoRepository
 import ru.pl.astronomypictureoftheday.utils.ImageManager
 import java.util.concurrent.TimeUnit
 
@@ -14,6 +12,7 @@ class WallpaperWorker(
     private val workerParameters: WorkerParameters
 ) : CoroutineWorker(context, workerParameters) {
 
+    //todo передавать в конструкторе
     private val imageManager = ImageManager()
     private val netRepository = NetPhotoRepository.get()
 

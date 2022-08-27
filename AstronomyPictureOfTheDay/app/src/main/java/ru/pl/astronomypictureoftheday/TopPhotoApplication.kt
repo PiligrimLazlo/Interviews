@@ -1,9 +1,9 @@
 package ru.pl.astronomypictureoftheday
 
 import android.app.Application
-import ru.pl.astronomypictureoftheday.model.repositories.PreferencesRepository
-import ru.pl.astronomypictureoftheday.model.repositories.DbPhotoRepository
-import ru.pl.astronomypictureoftheday.model.repositories.NetPhotoRepository
+import ru.pl.astronomypictureoftheday.data.repositories.PreferencesRepository
+import ru.pl.astronomypictureoftheday.data.repositories.DbPhotoRepository
+import ru.pl.astronomypictureoftheday.data.repositories.NetPhotoRepository
 
 class TopPhotoApplication: Application() {
     override fun onCreate() {

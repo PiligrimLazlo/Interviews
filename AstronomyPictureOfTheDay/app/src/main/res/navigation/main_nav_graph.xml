@@ -7,7 +7,7 @@
 
     <fragment
         android:id="@+id/tabsFragment"
-        android:name="ru.pl.astronomypictureoftheday.view.bottomnav.TabsFragment"
+        android:name="ru.pl.astronomypictureoftheday.presentation.fragments.TabsFragment"
         android:label="@string/app_name"
         tools:layout="@layout/fragment_bottom_nav">
         <action
@@ -20,12 +20,12 @@
     </fragment>
     <fragment
         android:id="@+id/photoDetailsFragment"
-        android:name="ru.pl.astronomypictureoftheday.view.photodetails.PhotoDetailsFragment"
+        android:name="ru.pl.astronomypictureoftheday.presentation.fragments.PhotoDetailsFragment"
         android:label="PhotoDetailsFragment"
         tools:layout="@layout/fragment_photo_details">
         <argument
             android:name="photoEntity"
-            app:argType="ru.pl.astronomypictureoftheday.model.PhotoEntity" />
+            app:argType="ru.pl.astronomypictureoftheday.data.PhotoEntity" />
         <argument
             android:name="title"
             app:argType="string" />
