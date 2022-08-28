@@ -7,16 +7,17 @@ import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import ru.pl.astronomypictureoftheday.domain.PhotoEntity
 import ru.pl.astronomypictureoftheday.data.repositories.NetPhotoRepositoryImpl
+import ru.pl.astronomypictureoftheday.domain.usecase.FetchPhotosNetUseCase
 
 private const val TAG = "PhotoListViewModel";
 
 class PhotoListViewModel : ListParentViewModel() {
     //todo передавать в конструкторе
     private val netPhotoRepositoryImpl = NetPhotoRepositoryImpl.get()
-    //private val dbPhotoRepository = DbPhotoRepository.get()
 
+    private val fetchPhotosNetUseCase = FetchPhotosNetUseCase(netPhotoRepositoryImpl)
 
-    //private var listFavPhotos = listOf<PhotoEntity>()
+    //это поле наблюдается из фрагмента
     private val _dbPhotoListState = MutableStateFlow<List<PhotoEntity>>(emptyList())
     val dbPhotoListState: StateFlow<List<PhotoEntity>>
         get() = _dbPhotoListState.asStateFlow()
@@ -32,8 +33,7 @@ class PhotoListViewModel : ListParentViewModel() {
     }
 
     private fun collectInfPhotoList(): Flow<PagingData<PhotoEntity>> {
-        return netPhotoRepositoryImpl
-            .fetchPhotos()
+        return fetchPhotosNetUseCase()
             /*.map {
                 it.map { oldFavPhoto ->
                     val newFavPhoto =
@@ -50,7 +50,6 @@ class PhotoListViewModel : ListParentViewModel() {
     private fun collectSavedPhotos() {
         viewModelScope.launch {
             dbPhotoRepositoryIml.getPhotos().collectLatest { newFavPhotoList ->
-                //listFavPhotos = newFavPhotoList
                 _dbPhotoListState.update { newFavPhotoList }
             }
         }

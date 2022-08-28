@@ -9,6 +9,8 @@ import androidx.work.WorkManager
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import ru.pl.astronomypictureoftheday.data.repositories.PreferencesRepositoryImpl
+import ru.pl.astronomypictureoftheday.domain.usecase.StoredAutoWallpPrefsUseCase
+import ru.pl.astronomypictureoftheday.domain.usecase.StoredThemePrefsUseCase
 import ru.pl.astronomypictureoftheday.presentation.viewModels.TabsViewModel.Companion.THEME_LIGHT
 import ru.pl.astronomypictureoftheday.workers.WallpaperWorker
 
@@ -24,6 +26,9 @@ class TabsViewModel(application: Application) : AndroidViewModel(application) {
     //todo передавать в конструкторе
     private val preferencesRepositoryImpl = PreferencesRepositoryImpl.get()
 
+    private val storedThemePrefsUseCase = StoredThemePrefsUseCase(preferencesRepositoryImpl)
+    private val storedAutoWallpPrefsUseCase = StoredAutoWallpPrefsUseCase(preferencesRepositoryImpl)
+
     init {
         //собираем тему из репозитория настроек
         collectTheme()
@@ -33,7 +38,7 @@ class TabsViewModel(application: Application) : AndroidViewModel(application) {
 
     private fun collectTheme() {
         viewModelScope.launch {
-            preferencesRepositoryImpl.storedTheme.collectLatest { storedTheme ->
+            storedThemePrefsUseCase.storedTheme.collectLatest { storedTheme ->
                 try {
                     _tabsState.update { oldState ->
                         oldState.copy(theme = storedTheme)
@@ -47,7 +52,7 @@ class TabsViewModel(application: Application) : AndroidViewModel(application) {
 
     private fun collectIsAutoWallpEnabled() {
         viewModelScope.launch {
-            preferencesRepositoryImpl.storedAutoWallpEnabled.collectLatest { storedBool ->
+            storedAutoWallpPrefsUseCase.isAutoWallp.collectLatest { storedBool ->
                 try {
                     _tabsState.update { oldState ->
                         oldState.copy(isAutoWallpapersEnabled = storedBool)
@@ -61,13 +66,13 @@ class TabsViewModel(application: Application) : AndroidViewModel(application) {
 
     fun setTheme(theme: Int) {
         viewModelScope.launch {
-            preferencesRepositoryImpl.setTheme(theme)
+            storedThemePrefsUseCase.setTheme(theme)
         }
     }
 
     fun setAutoWallpapersEnabled(isEnabled: Boolean) {
         viewModelScope.launch {
-            preferencesRepositoryImpl.setAutoWallpEnabled(isEnabled)
+            storedAutoWallpPrefsUseCase.setAutoWallp(isEnabled)
             notifyWorker(isEnabled)
         }
     }

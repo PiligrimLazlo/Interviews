@@ -26,7 +26,7 @@
         android:name="androidx.navigation.fragment.NavHostFragment"
         app:defaultNavHost="true"
         app:navGraph="@navigation/main_nav_graph"
-        tools:context=".MainActivity">
+        tools:context=".presentation.MainActivity">
     </androidx.fragment.app.FragmentContainerView>
 
 </LinearLayout>

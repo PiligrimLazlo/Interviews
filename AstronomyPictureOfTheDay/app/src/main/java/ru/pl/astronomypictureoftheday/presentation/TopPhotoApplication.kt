@@ -1,4 +1,4 @@
-package ru.pl.astronomypictureoftheday
+package ru.pl.astronomypictureoftheday.presentation
 
 import android.app.Application
 import ru.pl.astronomypictureoftheday.data.repositories.PreferencesRepositoryImpl
