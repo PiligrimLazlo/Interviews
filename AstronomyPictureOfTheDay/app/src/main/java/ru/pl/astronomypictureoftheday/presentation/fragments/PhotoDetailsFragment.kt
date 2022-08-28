@@ -52,12 +52,19 @@ class PhotoDetailsFragment : Fragment() {
     private lateinit var photoEntity: PhotoEntity
 
     //ask write in memory permission
-    private val requestWriteInMemoryPermissionLauncher = registerForActivityResult(
-        ActivityResultContracts.RequestPermission()
-    ) { permissionGranted ->
-        if (permissionGranted) {
-            photoDetailsViewModel.saveImageToPictureFolder()
+    private val requestReadWritePermissionLauncher = registerForActivityResult(
+        ActivityResultContracts.RequestMultiplePermissions()
+    ) { permissions ->
+        for (permission in permissions.entries) {
+            val permissionName = permission.key
+            val granted = permission.value
+
+            if (!granted) {
+                toast("$permissionName ${getString(R.string.permission_not_granted_error)}")
+                return@registerForActivityResult
+            }
         }
+        photoDetailsViewModel.saveImageToPictureFolder()
     }
 
     private val component by lazy {
@@ -151,10 +158,14 @@ class PhotoDetailsFragment : Fragment() {
         if (shouldShowRequestPermissionRationale(Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
             showRationaleDialog(
                 getString(R.string.error),
-                getString(R.string.write_permission_not_granted_error)
+                getString(R.string.permission_not_granted_error)
             )
         } else {
-            requestWriteInMemoryPermissionLauncher.launch(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+            requestReadWritePermissionLauncher.launch(
+                arrayOf(
+                    Manifest.permission.WRITE_EXTERNAL_STORAGE
+                )
+            )
         }
     }
 

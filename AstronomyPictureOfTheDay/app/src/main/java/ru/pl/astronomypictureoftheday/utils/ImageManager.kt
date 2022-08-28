@@ -38,10 +38,12 @@ class ImageManager @Inject constructor() {
         var bitmap = loadPhotoFromCache(absPathToSave)
         if (bitmap == null) {
             bitmap = loadBitmapFromNet(urlSource)
-            if (bitmap != null)
+            if (bitmap != null) {
                 FileOutputStream(absPathToSave).use {
                     bitmap.compress(Bitmap.CompressFormat.JPEG, 80, it)
                 }
+            }
+
         }
         return bitmap
     }
