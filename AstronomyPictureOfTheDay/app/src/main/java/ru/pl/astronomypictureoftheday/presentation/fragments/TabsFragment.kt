@@ -15,9 +15,10 @@ import androidx.navigation.ui.NavigationUI
 import com.google.android.material.switchmaterial.SwitchMaterial
 import kotlinx.coroutines.launch
 import ru.pl.astronomypictureoftheday.R
-import ru.pl.astronomypictureoftheday.data.repositories.PreferencesRepository
 import ru.pl.astronomypictureoftheday.databinding.FragmentBottomNavBinding
-import ru.pl.astronomypictureoftheday.presentation.bottomnav.TabsViewModel
+import ru.pl.astronomypictureoftheday.presentation.viewModels.TabsViewModel
+import ru.pl.astronomypictureoftheday.presentation.viewModels.TabsViewModel.Companion.THEME_DARK
+import ru.pl.astronomypictureoftheday.presentation.viewModels.TabsViewModel.Companion.THEME_LIGHT
 import kotlin.properties.Delegates
 
 private const val TAG = "TabsFragmentTag"
@@ -64,7 +65,7 @@ class TabsFragment : Fragment() {
                 tabsViewModel.tabsState.collect { state ->
                     currentTheme = state.theme
                     val themeMode =
-                        if (currentTheme == PreferencesRepository.THEME_LIGHT)
+                        if (currentTheme == THEME_LIGHT)
                             AppCompatDelegate.MODE_NIGHT_NO
                         else
                             AppCompatDelegate.MODE_NIGHT_YES
@@ -72,7 +73,6 @@ class TabsFragment : Fragment() {
 
                     checkedAutoWallpapersSet = state.isAutoWallpapersEnabled
                     Log.d(TAG, "tabs state changed $checkedAutoWallpapersSet")
-                    //TODO("Запускать или стопать воркер в зависимости от ↑")
                 }
             }
         }
@@ -87,13 +87,13 @@ class TabsFragment : Fragment() {
                 val switchItem = menu.findItem(R.id.enable_dark_mode)
                 switchItem.setActionView(R.layout.switch_dark_mode)
                 val switch: SwitchMaterial = switchItem.actionView.findViewById(R.id.switcher)
-                switch.isChecked = currentTheme == PreferencesRepository.THEME_DARK
+                switch.isChecked = currentTheme == THEME_DARK
 
                 switch.setOnCheckedChangeListener { _, isChecked ->
                     if (isChecked) {
-                        tabsViewModel.setTheme(PreferencesRepository.THEME_DARK)
+                        tabsViewModel.setTheme(THEME_DARK)
                     } else {
-                        tabsViewModel.setTheme(PreferencesRepository.THEME_LIGHT)
+                        tabsViewModel.setTheme(THEME_LIGHT)
                     }
                 }
 
@@ -120,4 +120,6 @@ class TabsFragment : Fragment() {
         super.onDestroyView()
         _binding = null
     }
+
+
 }

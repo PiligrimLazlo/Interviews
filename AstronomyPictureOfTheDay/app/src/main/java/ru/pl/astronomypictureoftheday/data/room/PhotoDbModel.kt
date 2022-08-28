@@ -6,9 +6,10 @@ import java.util.*
 
 @Entity(tableName = "saved_photo_table")
 data class PhotoDbModel(
-    @PrimaryKey(autoGenerate = true) val id: Int = 0,
-    val date: Date,
+    //@PrimaryKey(autoGenerate = true) val id: Int = 0,
+    @PrimaryKey
     val title: String,
+    val date: Date,
     val explanation: String,
     val imageUrl: String,
     val imageHdUrl: String = "",

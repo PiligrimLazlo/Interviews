@@ -1,13 +1,15 @@
-package ru.pl.astronomypictureoftheday.presentation.bottomnav
+package ru.pl.astronomypictureoftheday.presentation.viewModels
 
 import android.app.Application
 import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.work.*
+import androidx.work.ExistingPeriodicWorkPolicy
+import androidx.work.WorkManager
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
-import ru.pl.astronomypictureoftheday.data.repositories.PreferencesRepository
+import ru.pl.astronomypictureoftheday.data.repositories.PreferencesRepositoryImpl
+import ru.pl.astronomypictureoftheday.presentation.viewModels.TabsViewModel.Companion.THEME_LIGHT
 import ru.pl.astronomypictureoftheday.workers.WallpaperWorker
 
 private const val TAG = "TabsViewModel";
@@ -20,7 +22,7 @@ class TabsViewModel(application: Application) : AndroidViewModel(application) {
         get() = _tabsState.asStateFlow()
 
     //todo передавать в конструкторе
-    private val preferencesRepository = PreferencesRepository.get()
+    private val preferencesRepositoryImpl = PreferencesRepositoryImpl.get()
 
     init {
         //собираем тему из репозитория настроек
@@ -31,7 +33,7 @@ class TabsViewModel(application: Application) : AndroidViewModel(application) {
 
     private fun collectTheme() {
         viewModelScope.launch {
-            preferencesRepository.storedTheme.collectLatest { storedTheme ->
+            preferencesRepositoryImpl.storedTheme.collectLatest { storedTheme ->
                 try {
                     _tabsState.update { oldState ->
                         oldState.copy(theme = storedTheme)
@@ -45,7 +47,7 @@ class TabsViewModel(application: Application) : AndroidViewModel(application) {
 
     private fun collectIsAutoWallpEnabled() {
         viewModelScope.launch {
-            preferencesRepository.storedAutoWallpEnabled.collectLatest { storedBool ->
+            preferencesRepositoryImpl.storedAutoWallpEnabled.collectLatest { storedBool ->
                 try {
                     _tabsState.update { oldState ->
                         oldState.copy(isAutoWallpapersEnabled = storedBool)
@@ -59,13 +61,13 @@ class TabsViewModel(application: Application) : AndroidViewModel(application) {
 
     fun setTheme(theme: Int) {
         viewModelScope.launch {
-            preferencesRepository.setTheme(theme)
+            preferencesRepositoryImpl.setTheme(theme)
         }
     }
 
     fun setAutoWallpapersEnabled(isEnabled: Boolean) {
         viewModelScope.launch {
-            preferencesRepository.setAutoWallpEnabled(isEnabled)
+            preferencesRepositoryImpl.setAutoWallpEnabled(isEnabled)
             notifyWorker(isEnabled)
         }
     }
@@ -84,10 +86,13 @@ class TabsViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
-
+    companion object {
+        const val THEME_LIGHT = 0
+        const val THEME_DARK = 1
+    }
 }
 
 data class TabsUiState(
-    val theme: Int = PreferencesRepository.THEME_LIGHT,
+    val theme: Int = THEME_LIGHT,
     val isAutoWallpapersEnabled: Boolean = false
 )

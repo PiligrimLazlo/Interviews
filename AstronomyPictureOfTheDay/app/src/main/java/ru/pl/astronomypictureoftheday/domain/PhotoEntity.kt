@@ -1,4 +1,4 @@
-package ru.pl.astronomypictureoftheday.data
+package ru.pl.astronomypictureoftheday.domain
 
 import android.os.Parcelable
 import kotlinx.parcelize.Parcelize

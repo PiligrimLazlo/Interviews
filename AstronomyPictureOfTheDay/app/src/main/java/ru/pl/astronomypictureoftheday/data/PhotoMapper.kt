@@ -2,6 +2,7 @@ package ru.pl.astronomypictureoftheday.data
 
 import ru.pl.astronomypictureoftheday.data.api.PhotoDto
 import ru.pl.astronomypictureoftheday.data.room.PhotoDbModel
+import ru.pl.astronomypictureoftheday.domain.PhotoEntity
 import java.text.SimpleDateFormat
 import java.util.*
 

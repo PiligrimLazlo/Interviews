@@ -3,7 +3,7 @@ package ru.pl.astronomypictureoftheday.presentation.viewModels
 import android.app.Application
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import ru.pl.astronomypictureoftheday.data.PhotoEntity
+import ru.pl.astronomypictureoftheday.domain.PhotoEntity
 
 
 class ViewModelFactory(

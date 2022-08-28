@@ -7,7 +7,7 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import ru.pl.astronomypictureoftheday.R
-import ru.pl.astronomypictureoftheday.data.PhotoEntity
+import ru.pl.astronomypictureoftheday.domain.PhotoEntity
 
 //не использую viewBinding, т.к. будет 2 почти одинаковых класса с разными binding
 class PhotoViewHolder(private val view: View) :

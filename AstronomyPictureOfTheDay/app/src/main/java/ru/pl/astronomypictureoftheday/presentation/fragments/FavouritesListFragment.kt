@@ -55,8 +55,6 @@ class FavouritesListFragment : Fragment() {
                 }
             }
         }
-
-
     }
 
     override fun onDestroyView() {

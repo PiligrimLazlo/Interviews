@@ -25,7 +25,7 @@
         tools:layout="@layout/fragment_photo_details">
         <argument
             android:name="photoEntity"
-            app:argType="ru.pl.astronomypictureoftheday.data.PhotoEntity" />
+            app:argType="ru.pl.astronomypictureoftheday.domain.PhotoEntity" />
         <argument
             android:name="title"
             app:argType="string" />

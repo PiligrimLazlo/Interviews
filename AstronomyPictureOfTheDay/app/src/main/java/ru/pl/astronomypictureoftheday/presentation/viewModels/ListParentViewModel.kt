@@ -4,15 +4,15 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import ru.pl.astronomypictureoftheday.data.PhotoEntity
-import ru.pl.astronomypictureoftheday.data.repositories.DbPhotoRepository
+import ru.pl.astronomypictureoftheday.domain.PhotoEntity
+import ru.pl.astronomypictureoftheday.data.repositories.DbPhotoRepositoryIml
 import ru.pl.astronomypictureoftheday.utils.ImageManager
 import java.io.File
 
 open class ListParentViewModel: ViewModel() {
 
     //todo передавать в конструкторе
-    protected val dbPhotoRepository = DbPhotoRepository.get()
+    protected val dbPhotoRepositoryIml = DbPhotoRepositoryIml.get()
     private val imageManager: ImageManager = ImageManager()
 
     protected var listFavPhotos = listOf<PhotoEntity>()
@@ -22,8 +22,8 @@ open class ListParentViewModel: ViewModel() {
         viewModelScope.launch(Dispatchers.IO) {
             //сохраняем запись в базу и фото в кэш
             val filePath = imageManager.getInternalImageFullPathFile(photo.title, filesDir)
-            if (dbPhotoRepository.getPhoto(photo.title) == null) {
-                dbPhotoRepository.addPhoto(
+            if (dbPhotoRepositoryIml.getPhoto(photo.title) == null) {
+                dbPhotoRepositoryIml.addPhoto(
                     photo.copy(
                         isFavourite = true,
                         cachePhotoPath = filePath.absolutePath
@@ -31,7 +31,7 @@ open class ListParentViewModel: ViewModel() {
                 )
                 imageManager.savePhoto(photo.imageUrl, filePath)
             } else {
-                dbPhotoRepository.deletePhoto(photo.title)
+                dbPhotoRepositoryIml.deletePhoto(photo.title)
                 imageManager.deletePhoto(filePath)
             }
         }

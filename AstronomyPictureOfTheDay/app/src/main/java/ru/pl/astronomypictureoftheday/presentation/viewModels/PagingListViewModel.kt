@@ -6,14 +6,14 @@ import androidx.paging.cachedIn
 import androidx.paging.map
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
-import ru.pl.astronomypictureoftheday.data.PhotoEntity
-import ru.pl.astronomypictureoftheday.data.repositories.NetPhotoRepository
+import ru.pl.astronomypictureoftheday.domain.PhotoEntity
+import ru.pl.astronomypictureoftheday.data.repositories.NetPhotoRepositoryImpl
 
 private const val TAG = "PhotoListViewModel";
 
 class PhotoListViewModel : ListParentViewModel() {
     //todo передавать в конструкторе
-    private val netPhotoRepository = NetPhotoRepository.get()
+    private val netPhotoRepositoryImpl = NetPhotoRepositoryImpl.get()
     //private val dbPhotoRepository = DbPhotoRepository.get()
 
 
@@ -30,7 +30,7 @@ class PhotoListViewModel : ListParentViewModel() {
     }
 
     private fun collectInfPhotoList(): Flow<PagingData<PhotoEntity>> {
-        return netPhotoRepository
+        return netPhotoRepositoryImpl
             .fetchPhotos()
             .map {
                 it.map { oldFavPhoto ->
@@ -46,7 +46,7 @@ class PhotoListViewModel : ListParentViewModel() {
 
     private fun collectSavedPhotos() {
         viewModelScope.launch {
-            dbPhotoRepository.getPhotos().collectLatest { newFavPhotoList ->
+            dbPhotoRepositoryIml.getPhotos().collectLatest { newFavPhotoList ->
                 listFavPhotos = newFavPhotoList
             }
         }

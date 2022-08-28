@@ -3,7 +3,7 @@ package ru.pl.astronomypictureoftheday.workers
 import android.app.WallpaperManager
 import android.content.Context
 import androidx.work.*
-import ru.pl.astronomypictureoftheday.data.repositories.NetPhotoRepository
+import ru.pl.astronomypictureoftheday.data.repositories.NetPhotoRepositoryImpl
 import ru.pl.astronomypictureoftheday.utils.ImageManager
 import java.util.concurrent.TimeUnit
 
@@ -14,7 +14,7 @@ class WallpaperWorker(
 
     //todo передавать в конструкторе
     private val imageManager = ImageManager()
-    private val netRepository = NetPhotoRepository.get()
+    private val netRepository = NetPhotoRepositoryImpl.get()
 
     override suspend fun doWork(): Result {
         val photo = netRepository.fetchPhoto()

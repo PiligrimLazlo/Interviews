@@ -4,7 +4,7 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.paging.PagingDataAdapter
 import ru.pl.astronomypictureoftheday.R
-import ru.pl.astronomypictureoftheday.data.PhotoEntity
+import ru.pl.astronomypictureoftheday.domain.PhotoEntity
 
 private const val TAG = "PhotoListPagingAdapter"
 

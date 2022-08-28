@@ -1,7 +1,7 @@
 package ru.pl.astronomypictureoftheday.presentation.adapters
 
 import androidx.recyclerview.widget.DiffUtil
-import ru.pl.astronomypictureoftheday.data.PhotoEntity
+import ru.pl.astronomypictureoftheday.domain.PhotoEntity
 
 class PhotoComparator : DiffUtil.ItemCallback<PhotoEntity>() {
     override fun areItemsTheSame(oldItem: PhotoEntity, newItem: PhotoEntity): Boolean {

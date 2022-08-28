@@ -24,7 +24,7 @@ import com.bumptech.glide.request.RequestListener
 import com.bumptech.glide.request.target.Target
 import kotlinx.coroutines.launch
 import ru.pl.astronomypictureoftheday.R
-import ru.pl.astronomypictureoftheday.data.PhotoEntity
+import ru.pl.astronomypictureoftheday.domain.PhotoEntity
 import ru.pl.astronomypictureoftheday.databinding.FragmentPhotoDetailsBinding
 import ru.pl.astronomypictureoftheday.presentation.viewModels.PhotoDetailsState
 import ru.pl.astronomypictureoftheday.presentation.viewModels.PhotoDetailsViewModel

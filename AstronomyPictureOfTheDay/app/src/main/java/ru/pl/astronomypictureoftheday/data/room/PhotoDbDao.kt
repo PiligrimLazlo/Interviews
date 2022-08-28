@@ -9,9 +9,6 @@ interface PhotoDbDao {
     @Query("SELECT * FROM saved_photo_table")
     fun getPhotos(): Flow<List<PhotoDbModel>>
 
-    @Query("SELECT * FROM saved_photo_table WHERE id=:id")
-    suspend fun getPhoto(id: Int): PhotoDbModel?
-
     @Query("SELECT * FROM saved_photo_table WHERE title=:title")
     suspend fun getPhoto(title: String): PhotoDbModel?
 

@@ -4,7 +4,7 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.ListAdapter
 import ru.pl.astronomypictureoftheday.R
-import ru.pl.astronomypictureoftheday.data.PhotoEntity
+import ru.pl.astronomypictureoftheday.domain.PhotoEntity
 
 class PhotoListFavouritesAdapter(
     private val onPhotoClickListener: (PhotoEntity) -> Unit,

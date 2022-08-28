@@ -6,7 +6,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import ru.pl.astronomypictureoftheday.data.PhotoEntity
+import ru.pl.astronomypictureoftheday.domain.PhotoEntity
 
 class FavouritesListViewModel : ListParentViewModel() {
 
@@ -18,7 +18,7 @@ class FavouritesListViewModel : ListParentViewModel() {
 
     init {
         viewModelScope.launch {
-            dbPhotoRepository.getPhotos().collect { newList ->
+            dbPhotoRepositoryIml.getPhotos().collect { newList ->
                 _photosEntity.update { newList }
             }
         }
