@@ -14,28 +14,16 @@ import retrofit2.converter.moshi.MoshiConverterFactory
 import retrofit2.create
 import ru.pl.astronomypictureoftheday.domain.PhotoEntity
 import ru.pl.astronomypictureoftheday.data.PhotoMapper
-import ru.pl.astronomypictureoftheday.data.api.TopPhotoApi
+import ru.pl.astronomypictureoftheday.data.api.PhotoApi
 import ru.pl.astronomypictureoftheday.data.api.TopPhotoPagingSource
 import ru.pl.astronomypictureoftheday.domain.repository.NetPhotoRepository
 import ru.pl.astronomypictureoftheday.utils.JsonDateAdapter
+import javax.inject.Inject
 
-class NetPhotoRepositoryImpl private constructor(): NetPhotoRepository {
-    //todo передавать в конструкторе
-    private val topPhotoApi: TopPhotoApi by lazy {
-        val moshiBuilder = Moshi.Builder().add(JsonDateAdapter())
-
-        val logging = HttpLoggingInterceptor().apply { setLevel(HttpLoggingInterceptor.Level.BODY) }
-        val httpClient = OkHttpClient.Builder().apply { addInterceptor(logging) }
-        val retrofit = Retrofit
-            .Builder()
-            .baseUrl("https://api.nasa.gov/planetary/")
-            .addConverterFactory(MoshiConverterFactory.create(moshiBuilder.build()))
-            .client(httpClient.build())
-            .build()
-        retrofit.create()
-    }
-    private val mapper: PhotoMapper = PhotoMapper()
-
+class NetPhotoRepositoryImpl @Inject constructor(
+    private val photoApi: PhotoApi,
+    private val mapper: PhotoMapper
+): NetPhotoRepository {
 
     //for paging lib
     override fun fetchPhotos(): Flow<PagingData<PhotoEntity>> {
@@ -46,7 +34,7 @@ class NetPhotoRepositoryImpl private constructor(): NetPhotoRepository {
                 prefetchDistance = PAGE_SIZE / 2,
                 enablePlaceholders = false
             ),
-            pagingSourceFactory = { TopPhotoPagingSource(topPhotoApi) }
+            pagingSourceFactory = { TopPhotoPagingSource(photoApi) }
         ).flow
             .map { pagingData ->
                 pagingData.map { topPhotoResponse ->
@@ -56,27 +44,26 @@ class NetPhotoRepositoryImpl private constructor(): NetPhotoRepository {
     }
 
     override suspend fun fetchPhoto(): PhotoEntity {
-        return mapper.dtoToEntityPhoto(topPhotoApi.fetchTopPhoto())
+        return mapper.dtoToEntityPhoto(photoApi.fetchTopPhoto())
     }
 
 
 
     //todo убрать
     companion object {
-
-        private var INSTANCE: NetPhotoRepositoryImpl? = null
-
         const val PAGE_SIZE = 10
 
-        fun initialize() {
-            if (INSTANCE == null) {
-                INSTANCE = NetPhotoRepositoryImpl()
-            }
-        }
-
-        fun get(): NetPhotoRepositoryImpl {
-            return INSTANCE
-                ?: throw IllegalStateException("NetPhotoRepository must be initialized")
-        }
+//        private var INSTANCE: NetPhotoRepositoryImpl? = null
+//
+//        fun initialize() {
+//            if (INSTANCE == null) {
+//                INSTANCE = NetPhotoRepositoryImpl()
+//            }
+//        }
+//
+//        fun get(): NetPhotoRepositoryImpl {
+//            return INSTANCE
+//                ?: throw IllegalStateException("NetPhotoRepository must be initialized")
+//        }
     }
 }

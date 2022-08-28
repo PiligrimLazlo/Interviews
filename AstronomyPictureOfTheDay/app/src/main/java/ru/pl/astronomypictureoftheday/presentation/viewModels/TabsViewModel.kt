@@ -2,32 +2,31 @@ package ru.pl.astronomypictureoftheday.presentation.viewModels
 
 import android.app.Application
 import android.util.Log
-import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.WorkManager
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
-import ru.pl.astronomypictureoftheday.data.repositories.PreferencesRepositoryImpl
 import ru.pl.astronomypictureoftheday.domain.usecase.StoredAutoWallpPrefsUseCase
 import ru.pl.astronomypictureoftheday.domain.usecase.StoredThemePrefsUseCase
 import ru.pl.astronomypictureoftheday.presentation.viewModels.TabsViewModel.Companion.THEME_LIGHT
 import ru.pl.astronomypictureoftheday.workers.WallpaperWorker
+import javax.inject.Inject
 
 private const val TAG = "TabsViewModel";
 
 
-class TabsViewModel(application: Application) : AndroidViewModel(application) {
+class TabsViewModel @Inject constructor(
+    private val application: Application,
+    private val storedThemePrefsUseCase: StoredThemePrefsUseCase,
+    private val storedAutoWallpPrefsUseCase: StoredAutoWallpPrefsUseCase
+) : ViewModel() {
 
     private val _tabsState: MutableStateFlow<TabsUiState> = MutableStateFlow(TabsUiState())
     val tabsState: StateFlow<TabsUiState>
         get() = _tabsState.asStateFlow()
 
-    //todo передавать в конструкторе
-    private val preferencesRepositoryImpl = PreferencesRepositoryImpl.get()
-
-    private val storedThemePrefsUseCase = StoredThemePrefsUseCase(preferencesRepositoryImpl)
-    private val storedAutoWallpPrefsUseCase = StoredAutoWallpPrefsUseCase(preferencesRepositoryImpl)
 
     init {
         //собираем тему из репозитория настроек
@@ -80,13 +79,13 @@ class TabsViewModel(application: Application) : AndroidViewModel(application) {
     private fun notifyWorker(isEnabled: Boolean) {
         if (isEnabled) {
             val periodicRequest = WallpaperWorker.makeRequest()
-            WorkManager.getInstance(getApplication()).enqueueUniquePeriodicWork(
+            WorkManager.getInstance(application).enqueueUniquePeriodicWork(
                 WallpaperWorker.AUTO_SET_WALLPAPER,
                 ExistingPeriodicWorkPolicy.KEEP,
                 periodicRequest
             )
         } else {
-            WorkManager.getInstance(getApplication())
+            WorkManager.getInstance(application)
                 .cancelUniqueWork(WallpaperWorker.AUTO_SET_WALLPAPER)
         }
     }

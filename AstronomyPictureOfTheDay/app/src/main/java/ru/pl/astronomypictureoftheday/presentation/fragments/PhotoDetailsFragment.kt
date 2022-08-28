@@ -2,6 +2,7 @@ package ru.pl.astronomypictureoftheday.presentation.fragments
 
 import android.Manifest
 import android.annotation.SuppressLint
+import android.content.Context
 import android.graphics.BitmapFactory
 import android.graphics.drawable.Drawable
 import android.os.Bundle
@@ -26,11 +27,13 @@ import kotlinx.coroutines.launch
 import ru.pl.astronomypictureoftheday.R
 import ru.pl.astronomypictureoftheday.domain.PhotoEntity
 import ru.pl.astronomypictureoftheday.databinding.FragmentPhotoDetailsBinding
+import ru.pl.astronomypictureoftheday.presentation.TopPhotoApplication
 import ru.pl.astronomypictureoftheday.presentation.viewModels.PhotoDetailsState
 import ru.pl.astronomypictureoftheday.presentation.viewModels.PhotoDetailsViewModel
-import ru.pl.astronomypictureoftheday.presentation.viewModels.ViewModelFactory
+import ru.pl.astronomypictureoftheday.presentation.viewModels.PhotoViewModelFactory
 import ru.pl.astronomypictureoftheday.utils.toast
 import java.io.File
+import javax.inject.Inject
 
 class PhotoDetailsFragment : Fragment() {
 
@@ -40,8 +43,10 @@ class PhotoDetailsFragment : Fragment() {
             getString(R.string.binding_null_error)
         }
 
+    @Inject
+    lateinit var photoViewModelFactory: PhotoViewModelFactory
     private val photoDetailsViewModel: PhotoDetailsViewModel by viewModels {
-        ViewModelFactory(requireActivity().application, photoEntity)
+        photoViewModelFactory
     }
     private val args: PhotoDetailsFragmentArgs by navArgs()
     private lateinit var photoEntity: PhotoEntity
@@ -55,9 +60,21 @@ class PhotoDetailsFragment : Fragment() {
         }
     }
 
+    private val component by lazy {
+        (requireActivity().application as TopPhotoApplication)
+            .component
+            .fragmentComponentFactory()
+            .create(photoEntity)
+    }
+
+    override fun onAttach(context: Context) {
+        photoEntity = args.photoEntity
+        component.inject(this)
+        super.onAttach(context)
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        photoEntity = args.photoEntity
     }
 
     override fun onCreateView(

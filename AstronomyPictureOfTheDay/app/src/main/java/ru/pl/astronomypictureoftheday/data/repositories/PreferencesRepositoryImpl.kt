@@ -7,12 +7,12 @@ import androidx.datastore.preferences.preferencesDataStoreFile
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
-import ru.pl.astronomypictureoftheday.domain.repository.PreferencesPhotoRepository
+import ru.pl.astronomypictureoftheday.domain.repository.PreferencesRepository
 import java.lang.IllegalStateException
 
 class PreferencesRepositoryImpl private constructor(
     private val dataStore: DataStore<Preferences>
-): PreferencesPhotoRepository {
+): PreferencesRepository {
 
     override val storedTheme: Flow<Int> = dataStore.data.map {
         it[THEME_KEY] ?: 0

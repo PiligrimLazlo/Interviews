@@ -6,17 +6,24 @@ import androidx.paging.cachedIn
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import ru.pl.astronomypictureoftheday.domain.PhotoEntity
-import ru.pl.astronomypictureoftheday.data.repositories.NetPhotoRepositoryImpl
-import ru.pl.astronomypictureoftheday.domain.usecase.FetchPhotosNetUseCase
+import ru.pl.astronomypictureoftheday.domain.usecase.*
+import ru.pl.astronomypictureoftheday.utils.ImageManager
+import javax.inject.Inject
 
-private const val TAG = "PhotoListViewModel";
-
-class PhotoListViewModel : ListParentViewModel() {
-    //todo передавать в конструкторе
-    private val netPhotoRepositoryImpl = NetPhotoRepositoryImpl.get()
-
-    private val fetchPhotosNetUseCase = FetchPhotosNetUseCase(netPhotoRepositoryImpl)
-
+class PagingListViewModel @Inject constructor(
+    imageManager: ImageManager,
+    getPhotoDbUseCase: GetPhotoDbUseCase,
+    addPhotoDbUseCase: AddPhotoDbUseCase,
+    deletePhotoDbUseCase: DeletePhotoDbUseCase,
+    getPhotosDbUseCase: GetPhotosDbUseCase,
+    private val fetchPhotosNetUseCase: FetchPhotosNetUseCase
+) : ListParentViewModel(
+    imageManager,
+    getPhotoDbUseCase,
+    addPhotoDbUseCase,
+    deletePhotoDbUseCase,
+    getPhotosDbUseCase
+) {
     //это поле наблюдается из фрагмента
     private val _dbPhotoListState = MutableStateFlow<List<PhotoEntity>>(emptyList())
     val dbPhotoListState: StateFlow<List<PhotoEntity>>
@@ -49,7 +56,7 @@ class PhotoListViewModel : ListParentViewModel() {
 
     private fun collectSavedPhotos() {
         viewModelScope.launch {
-            dbPhotoRepositoryIml.getPhotos().collectLatest { newFavPhotoList ->
+            getPhotosDbUseCase().collectLatest { newFavPhotoList ->
                 _dbPhotoListState.update { newFavPhotoList }
             }
         }

@@ -1,5 +1,6 @@
 package ru.pl.astronomypictureoftheday.presentation.fragments
 
+import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -16,15 +17,18 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import ru.pl.astronomypictureoftheday.R
 import ru.pl.astronomypictureoftheday.databinding.FragmentPhotoListBinding
+import ru.pl.astronomypictureoftheday.presentation.TopPhotoApplication
 import ru.pl.astronomypictureoftheday.presentation.adapters.PhotoListPagingAdapter
 import ru.pl.astronomypictureoftheday.presentation.adapters.PhotoLoadStateAdapter
-import ru.pl.astronomypictureoftheday.presentation.viewModels.PhotoListViewModel
+import ru.pl.astronomypictureoftheday.presentation.viewModels.PagingListViewModel
+import ru.pl.astronomypictureoftheday.presentation.viewModels.PhotoViewModelFactory
 import ru.pl.astronomypictureoftheday.utils.findTopNavController
 import ru.pl.astronomypictureoftheday.utils.toast
+import javax.inject.Inject
 
 private const val TAG = "PhotoListFragment";
 
-class PhotoListFragment : Fragment() {
+class PagingListFragment : Fragment() {
 
     private var _binding: FragmentPhotoListBinding? = null
     private val binding
@@ -32,9 +36,24 @@ class PhotoListFragment : Fragment() {
             getString(R.string.binding_null_error)
         }
 
-    private val photoListViewModel: PhotoListViewModel by viewModels()
+    @Inject
+    lateinit var photoViewModelFactory: PhotoViewModelFactory
+    private val pagingListViewModel: PagingListViewModel by viewModels {
+        photoViewModelFactory
+    }
     private lateinit var pagingAdapter: PhotoListPagingAdapter
 
+    private val component by lazy {
+        (requireActivity().application as TopPhotoApplication)
+            .component
+            /*.fragmentComponentFactory()
+            .create(null)*/
+    }
+
+    override fun onAttach(context: Context) {
+        component.inject(this)
+        super.onAttach(context)
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -79,7 +98,7 @@ class PhotoListFragment : Fragment() {
             } else {
                 toast("\"${it.title}\" ${getString(R.string.removed_from_favourites)}")
             }
-            photoListViewModel.onSaveFavouriteButtonPressed(it, requireContext().filesDir)
+            pagingListViewModel.onSaveFavouriteButtonPressed(it, requireContext().filesDir)
         })
     }
 
@@ -95,7 +114,7 @@ class PhotoListFragment : Fragment() {
     private fun collectAdapterData(pagingAdapter: PhotoListPagingAdapter) {
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                photoListViewModel.photoEntityItemsFromPaging.collectLatest {
+                pagingListViewModel.photoEntityItemsFromPaging.collectLatest {
                     pagingAdapter.submitData(it)
                 }
             }
@@ -112,7 +131,7 @@ class PhotoListFragment : Fragment() {
     private fun collectDbPhotoList() {
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                photoListViewModel.dbPhotoListState.collect {
+                pagingListViewModel.dbPhotoListState.collect {
                     pagingAdapter.onChangeFavourites(it)
                 }
             }

@@ -1,5 +1,6 @@
 package ru.pl.astronomypictureoftheday.presentation.fragments
 
+import android.content.Context
 import android.os.Bundle
 import android.util.Log
 import android.view.*
@@ -16,9 +17,12 @@ import com.google.android.material.switchmaterial.SwitchMaterial
 import kotlinx.coroutines.launch
 import ru.pl.astronomypictureoftheday.R
 import ru.pl.astronomypictureoftheday.databinding.FragmentBottomNavBinding
+import ru.pl.astronomypictureoftheday.presentation.TopPhotoApplication
+import ru.pl.astronomypictureoftheday.presentation.viewModels.PhotoViewModelFactory
 import ru.pl.astronomypictureoftheday.presentation.viewModels.TabsViewModel
 import ru.pl.astronomypictureoftheday.presentation.viewModels.TabsViewModel.Companion.THEME_DARK
 import ru.pl.astronomypictureoftheday.presentation.viewModels.TabsViewModel.Companion.THEME_LIGHT
+import javax.inject.Inject
 import kotlin.properties.Delegates
 
 private const val TAG = "TabsFragmentTag"
@@ -31,9 +35,25 @@ class TabsFragment : Fragment() {
             getString(R.string.binding_null_error)
         }
 
-    private val tabsViewModel: TabsViewModel by viewModels()
+    @Inject
+    lateinit var photoViewModelFactory: PhotoViewModelFactory
+    private val tabsViewModel: TabsViewModel by viewModels {
+        photoViewModelFactory
+    }
     private var currentTheme by Delegates.notNull<Int>()
     private var checkedAutoWallpapersSet by Delegates.notNull<Boolean>()
+
+    private val component by lazy {
+        (requireActivity().application as TopPhotoApplication)
+            .component
+            /*.fragmentComponentFactory()
+            .create(null)*/
+    }
+
+    override fun onAttach(context: Context) {
+        component.inject(this)
+        super.onAttach(context)
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,

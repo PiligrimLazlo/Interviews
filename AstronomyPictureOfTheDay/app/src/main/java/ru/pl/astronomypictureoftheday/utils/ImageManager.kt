@@ -10,8 +10,9 @@ import androidx.core.graphics.scale
 import java.io.File
 import java.io.FileOutputStream
 import java.net.URL
+import javax.inject.Inject
 
-class ImageManager {
+class ImageManager @Inject constructor() {
 
     //user's saved photos
     fun getPublicImageFullPathFile(title: String): File {

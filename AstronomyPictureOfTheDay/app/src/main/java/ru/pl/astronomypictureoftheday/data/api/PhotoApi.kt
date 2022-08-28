@@ -5,7 +5,7 @@ import retrofit2.http.Query
 
 private const val API_KEY = "g2i26rNZnPGzrK7pV62jkvSwj3aKPwojszearVQ3"
 
-interface TopPhotoApi {
+interface PhotoApi {
 
     @GET("apod?api_key=$API_KEY")
     suspend fun fetchTopPhoto(): PhotoDto

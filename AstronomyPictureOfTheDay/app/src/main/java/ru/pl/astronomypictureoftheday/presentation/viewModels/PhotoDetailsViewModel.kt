@@ -13,18 +13,18 @@ import kotlinx.coroutines.launch
 import ru.pl.astronomypictureoftheday.R
 import ru.pl.astronomypictureoftheday.domain.PhotoEntity
 import ru.pl.astronomypictureoftheday.utils.ImageManager
+import javax.inject.Inject
 
 
-class PhotoDetailsViewModel(
+class PhotoDetailsViewModel @Inject constructor(
     private val application: Application,
-    private val photo: PhotoEntity
+    private val photo: PhotoEntity,
+    private val imageManager: ImageManager
 ) : ViewModel() {
     private val _detailsState: MutableStateFlow<PhotoDetailsState> =
         MutableStateFlow(PhotoDetailsState())
     val detailsState: StateFlow<PhotoDetailsState>
         get() = _detailsState.asStateFlow()
-    //todo передавать в конструкторе
-    private val imageManager: ImageManager = ImageManager()
 
 
     fun saveImageToPictureFolder() {

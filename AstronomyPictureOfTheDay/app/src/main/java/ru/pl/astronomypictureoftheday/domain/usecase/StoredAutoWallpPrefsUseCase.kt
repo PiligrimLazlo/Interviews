@@ -1,14 +1,17 @@
 package ru.pl.astronomypictureoftheday.domain.usecase
 
 import kotlinx.coroutines.flow.Flow
-import ru.pl.astronomypictureoftheday.domain.repository.PreferencesPhotoRepository
+import ru.pl.astronomypictureoftheday.domain.repository.PreferencesRepository
+import javax.inject.Inject
 
-class StoredAutoWallpPrefsUseCase(private val preferencesPhotoRepository: PreferencesPhotoRepository) {
+class StoredAutoWallpPrefsUseCase @Inject constructor(
+    private val preferencesRepository: PreferencesRepository
+) {
 
-    val isAutoWallp: Flow<Boolean> = preferencesPhotoRepository.storedAutoWallpEnabled
+    val isAutoWallp: Flow<Boolean> = preferencesRepository.storedAutoWallpEnabled
 
     suspend fun setAutoWallp(boolean: Boolean) {
-        preferencesPhotoRepository.setAutoWallpEnabled(boolean)
+        preferencesRepository.setAutoWallpEnabled(boolean)
     }
 
 }

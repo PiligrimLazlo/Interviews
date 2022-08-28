@@ -1,5 +1,6 @@
 package ru.pl.astronomypictureoftheday.presentation.fragments
 
+import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -13,10 +14,13 @@ import androidx.recyclerview.widget.GridLayoutManager
 import kotlinx.coroutines.launch
 import ru.pl.astronomypictureoftheday.R
 import ru.pl.astronomypictureoftheday.databinding.FragmentFavouritesBinding
+import ru.pl.astronomypictureoftheday.presentation.TopPhotoApplication
 import ru.pl.astronomypictureoftheday.presentation.adapters.PhotoListFavouritesAdapter
 import ru.pl.astronomypictureoftheday.presentation.viewModels.FavouritesListViewModel
+import ru.pl.astronomypictureoftheday.presentation.viewModels.PhotoViewModelFactory
 import ru.pl.astronomypictureoftheday.utils.findTopNavController
 import ru.pl.astronomypictureoftheday.utils.toast
+import javax.inject.Inject
 
 class FavouritesListFragment : Fragment() {
 
@@ -26,7 +30,23 @@ class FavouritesListFragment : Fragment() {
             getString(R.string.binding_null_error)
         }
 
-    private val favouritesListViewModel: FavouritesListViewModel by viewModels()
+    @Inject
+    lateinit var photoViewModelFactory: PhotoViewModelFactory
+    private val favouritesListViewModel: FavouritesListViewModel by viewModels {
+        photoViewModelFactory
+    }
+
+    private val component by lazy {
+        (requireActivity().application as TopPhotoApplication)
+            .component
+            /*.fragmentComponentFactory()
+            .create(null)*/
+    }
+
+    override fun onAttach(context: Context) {
+        component.inject(this)
+        super.onAttach(context)
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,

@@ -3,21 +3,16 @@ package ru.pl.astronomypictureoftheday.workers
 import android.app.WallpaperManager
 import android.content.Context
 import androidx.work.*
-import ru.pl.astronomypictureoftheday.data.repositories.NetPhotoRepositoryImpl
 import ru.pl.astronomypictureoftheday.domain.usecase.FetchPhotoNetUseCase
-import ru.pl.astronomypictureoftheday.domain.usecase.FetchPhotosNetUseCase
 import ru.pl.astronomypictureoftheday.utils.ImageManager
 import java.util.concurrent.TimeUnit
 
 class WallpaperWorker(
     private val context: Context,
-    private val workerParameters: WorkerParameters
+    private val workerParameters: WorkerParameters,
+    private val imageManager: ImageManager,
+    private val fetchPhotoNetUseCase: FetchPhotoNetUseCase
 ) : CoroutineWorker(context, workerParameters) {
-
-    //todo передавать в конструкторе
-    private val imageManager = ImageManager()
-    private val netRepository = NetPhotoRepositoryImpl.get()
-    private val fetchPhotoNetUseCase = FetchPhotoNetUseCase(netRepository)
 
     override suspend fun doWork(): Result {
         val photo = fetchPhotoNetUseCase()

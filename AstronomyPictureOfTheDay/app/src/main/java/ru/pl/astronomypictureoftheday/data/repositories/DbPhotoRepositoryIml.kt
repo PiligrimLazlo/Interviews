@@ -1,30 +1,18 @@
 package ru.pl.astronomypictureoftheday.data.repositories
 
-import android.content.Context
-import androidx.room.Room
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import ru.pl.astronomypictureoftheday.data.PhotoMapper
-import ru.pl.astronomypictureoftheday.data.room.PhotoDatabase
+import ru.pl.astronomypictureoftheday.data.room.PhotoDbDao
 import ru.pl.astronomypictureoftheday.domain.PhotoEntity
 import ru.pl.astronomypictureoftheday.domain.repository.DbPhotoRepository
+import javax.inject.Inject
 
-class DbPhotoRepositoryIml private constructor(
-    context: Context
-): DbPhotoRepository {
+class DbPhotoRepositoryIml @Inject constructor(
+    private val dao: PhotoDbDao,
+    private val mapper: PhotoMapper
+) : DbPhotoRepository {
 
-    //todo передавать в конструкторе
-    private val database: PhotoDatabase by lazy {
-        Room.databaseBuilder(
-            context.applicationContext,
-            PhotoDatabase::class.java,
-            "saved_photo_db"
-        )
-            .fallbackToDestructiveMigration()
-            .build()
-    }
-    private val dao = database.photoDao()
-    private val mapper: PhotoMapper = PhotoMapper()
 
     override fun getPhotos(): Flow<List<PhotoEntity>> =
         dao.getPhotos().map {
@@ -49,18 +37,18 @@ class DbPhotoRepositoryIml private constructor(
 
 
     //todo убрать
-    companion object {
-        private var INSTANCE: DbPhotoRepositoryIml? = null
-
-        fun initialize(context: Context) {
-            if (INSTANCE == null) {
-                INSTANCE = DbPhotoRepositoryIml(context)
-            }
-        }
-
-        fun get(): DbPhotoRepositoryIml {
-            return INSTANCE
-                ?: throw IllegalStateException("FavouritePhotoRepository must be initialized")
-        }
-    }
+//    companion object {
+//        private var INSTANCE: DbPhotoRepositoryIml? = null
+//
+//        fun initialize(context: Context) {
+//            if (INSTANCE == null) {
+//                INSTANCE = DbPhotoRepositoryIml(context)
+//            }
+//        }
+//
+//        fun get(): DbPhotoRepositoryIml {
+//            return INSTANCE
+//                ?: throw IllegalStateException("FavouritePhotoRepository must be initialized")
+//        }
+//    }
 }

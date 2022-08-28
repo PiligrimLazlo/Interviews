@@ -5,8 +5,9 @@ import ru.pl.astronomypictureoftheday.data.room.PhotoDbModel
 import ru.pl.astronomypictureoftheday.domain.PhotoEntity
 import java.text.SimpleDateFormat
 import java.util.*
+import javax.inject.Inject
 
-class PhotoMapper {
+class PhotoMapper @Inject constructor() {
 
     fun dtoToEntityPhoto(photoDto: PhotoDto) = PhotoEntity(
         formattedDate = dateToFormattedDateString(photoDto.date),

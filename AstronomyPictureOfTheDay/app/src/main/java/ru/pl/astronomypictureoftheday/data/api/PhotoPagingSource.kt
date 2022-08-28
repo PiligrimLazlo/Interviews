@@ -11,7 +11,7 @@ import java.time.temporal.ChronoUnit
 private const val TAG = "TopPhotoPagingSource"
 
 class TopPhotoPagingSource(
-    private val topPhotoApi: TopPhotoApi
+    private val photoApi: PhotoApi
 ) : PagingSource<Int, PhotoDto>() {
     override suspend fun load(params: LoadParams<Int>): LoadResult<Int, PhotoDto> {
         return try {
@@ -19,7 +19,7 @@ class TopPhotoPagingSource(
 
             val period = getPeriod(params.loadSize, pageIndex)
 
-            val favouritePhotoList: List<PhotoDto> = topPhotoApi
+            val favouritePhotoList: List<PhotoDto> = photoApi
                 .fetchTopPhotos(period.first, period.second)
                 .reversed()
             Log.d(TAG, "${period.first} : ${period.second} -> pageIndex: $pageIndex")

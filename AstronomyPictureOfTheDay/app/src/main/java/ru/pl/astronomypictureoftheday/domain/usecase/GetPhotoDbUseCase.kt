@@ -2,8 +2,9 @@ package ru.pl.astronomypictureoftheday.domain.usecase
 
 import ru.pl.astronomypictureoftheday.domain.PhotoEntity
 import ru.pl.astronomypictureoftheday.domain.repository.DbPhotoRepository
+import javax.inject.Inject
 
-class GetPhotoDbUseCase(
+class GetPhotoDbUseCase @Inject constructor(
     private val dbPhotoRepository: DbPhotoRepository
 ) {
 

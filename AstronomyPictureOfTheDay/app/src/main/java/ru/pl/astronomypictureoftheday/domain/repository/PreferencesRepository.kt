@@ -2,7 +2,7 @@ package ru.pl.astronomypictureoftheday.domain.repository
 
 import kotlinx.coroutines.flow.Flow
 
-interface PreferencesPhotoRepository {
+interface PreferencesRepository {
     val storedTheme: Flow<Int>
     suspend fun setTheme(theme: Int)
 
