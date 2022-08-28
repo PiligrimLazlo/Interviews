@@ -34,6 +34,12 @@ class ImageManager @Inject constructor() {
         return "NasaAPOD_$formattedTitle.jpg"
     }
 
+    //todo Проблема: при ручном удалении фото с реального устройства (сяоми)
+    //todo фото остается в памяти (в корзине), но метод File.exist() возвращает false.
+    //todo И запись по этому пути выдает exception
+    //todo Добавить временнУю метку к каждому фото при сохранении
+    //todo Далее чтобы проверить лежит ли такая фотка в памяти, нужно проходить по всем фоткам
+    //todo и сравнивать по регулярке что-то типо "имя файла, кроме цифр времени в конце"
     fun savePhoto(urlSource: String, absPathToSave: File): Bitmap? {
         var bitmap = loadPhotoFromCache(absPathToSave)
         if (bitmap == null) {
