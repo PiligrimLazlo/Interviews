@@ -35,20 +35,4 @@ class DbPhotoRepositoryIml @Inject constructor(
         dao.deletePhoto(title)
     }
 
-
-    //todo убрать
-//    companion object {
-//        private var INSTANCE: DbPhotoRepositoryIml? = null
-//
-//        fun initialize(context: Context) {
-//            if (INSTANCE == null) {
-//                INSTANCE = DbPhotoRepositoryIml(context)
-//            }
-//        }
-//
-//        fun get(): DbPhotoRepositoryIml {
-//            return INSTANCE
-//                ?: throw IllegalStateException("FavouritePhotoRepository must be initialized")
-//        }
-//    }
 }

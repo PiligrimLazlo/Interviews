@@ -49,21 +49,8 @@ class NetPhotoRepositoryImpl @Inject constructor(
 
 
 
-    //todo убрать
     companion object {
         const val PAGE_SIZE = 10
 
-//        private var INSTANCE: NetPhotoRepositoryImpl? = null
-//
-//        fun initialize() {
-//            if (INSTANCE == null) {
-//                INSTANCE = NetPhotoRepositoryImpl()
-//            }
-//        }
-//
-//        fun get(): NetPhotoRepositoryImpl {
-//            return INSTANCE
-//                ?: throw IllegalStateException("NetPhotoRepository must be initialized")
-//        }
     }
 }
