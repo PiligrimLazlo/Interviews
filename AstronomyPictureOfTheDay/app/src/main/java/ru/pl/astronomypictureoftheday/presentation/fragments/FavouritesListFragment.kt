@@ -16,6 +16,7 @@ import ru.pl.astronomypictureoftheday.databinding.FragmentFavouritesBinding
 import ru.pl.astronomypictureoftheday.presentation.adapters.PhotoListFavouritesAdapter
 import ru.pl.astronomypictureoftheday.presentation.viewModels.FavouritesListViewModel
 import ru.pl.astronomypictureoftheday.utils.findTopNavController
+import ru.pl.astronomypictureoftheday.utils.toast
 
 class FavouritesListFragment : Fragment() {
 
@@ -43,6 +44,11 @@ class FavouritesListFragment : Fragment() {
         val adapter = PhotoListFavouritesAdapter({
             findTopNavController().navigate(TabsFragmentDirections.goToDetails(it, it.title))
         }, {
+            if (!it.isFavourite) {
+                toast("\"${it.title}\" ${getString(R.string.added_to_favourites)}")
+            } else {
+                toast("\"${it.title}\" ${getString(R.string.removed_from_favourites)}")
+            }
             favouritesListViewModel.onSaveFavouriteButtonPressed(it, requireContext().filesDir)
         })
         binding.photoGridFavourites.adapter = adapter

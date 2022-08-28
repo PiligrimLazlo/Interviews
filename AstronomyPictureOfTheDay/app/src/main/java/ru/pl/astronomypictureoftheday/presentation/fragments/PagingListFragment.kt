@@ -33,6 +33,7 @@ class PhotoListFragment : Fragment() {
         }
 
     private val photoListViewModel: PhotoListViewModel by viewModels()
+    private lateinit var pagingAdapter: PhotoListPagingAdapter
 
 
     override fun onCreateView(
@@ -55,7 +56,7 @@ class PhotoListFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         //paging adapter
-        val pagingAdapter = setupPagingAdapter()
+        pagingAdapter = setupPagingAdapter()
         //footer progress + error msg + retry btn
         setUpAdapterHeaderAndFooter(pagingAdapter)
         //paging collect data from viewModel
@@ -64,13 +65,16 @@ class PhotoListFragment : Fragment() {
         binding.retryButton.setOnClickListener { pagingAdapter.retry() }
         //paging center progress and btn visibility
         collectAdapterLoadState(pagingAdapter)
+
+        //это нужно для синхр с БД
+        collectDbPhotoList()
     }
 
     private fun setupPagingAdapter(): PhotoListPagingAdapter {
         return PhotoListPagingAdapter({
             findTopNavController().navigate(TabsFragmentDirections.goToDetails(it, it.title))
         }, {
-            if (it.isFavourite) {
+            if (!it.isFavourite) {
                 toast("\"${it.title}\" ${getString(R.string.added_to_favourites)}")
             } else {
                 toast("\"${it.title}\" ${getString(R.string.removed_from_favourites)}")
@@ -105,7 +109,15 @@ class PhotoListFragment : Fragment() {
         )
     }
 
-
+    private fun collectDbPhotoList() {
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                photoListViewModel.dbPhotoListState.collect {
+                    pagingAdapter.onChangeFavourites(it)
+                }
+            }
+        }
+    }
 
 
     private fun setUpLayoutManager(): GridLayoutManager {
@@ -117,7 +129,6 @@ class PhotoListFragment : Fragment() {
         }
         return layoutManger
     }
-
 
 
 }

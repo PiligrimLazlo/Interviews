@@ -17,11 +17,14 @@ class PhotoViewHolder(private val view: View) :
     private val topPhotoImage = view.findViewById<ImageView>(R.id.top_photo_image)
     private val starBtn = view.findViewById<ImageButton>(R.id.star_btn)
 
+
+
     fun bind(
         photoEntity: PhotoEntity,
         onPhotoClickListener: (PhotoEntity) -> Unit,
         onSaveButtonPressedListener: (PhotoEntity) -> Unit
     ) {
+
         topPhotoTv.text = photoEntity.title
         Glide.with(view.context)
             .load(photoEntity.imageUrl)
@@ -34,12 +37,13 @@ class PhotoViewHolder(private val view: View) :
         }
 
         starBtn.setOnClickListener {
-            photoEntity.isFavourite = !photoEntity.isFavourite
-            updateColor(photoEntity.isFavourite)
+            //photoEntity.isFavourite = !photoEntity.isFavourite
+            updateColor(!photoEntity.isFavourite)
             onSaveButtonPressedListener(photoEntity)
         }
         updateColor(photoEntity.isFavourite)
     }
+
 
     private fun updateColor(isFavourite: Boolean) {
         starBtn.background.setTint(

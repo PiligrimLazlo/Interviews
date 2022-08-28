@@ -7,8 +7,11 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import ru.pl.astronomypictureoftheday.domain.PhotoEntity
+import ru.pl.astronomypictureoftheday.domain.usecase.GetPhotosDbUseCase
 
 class FavouritesListViewModel : ListParentViewModel() {
+
+    private val getPhotosDbUseCase: GetPhotosDbUseCase = GetPhotosDbUseCase(dbPhotoRepositoryIml)
 
 
     private val _photosEntity: MutableStateFlow<List<PhotoEntity>> =
@@ -18,7 +21,7 @@ class FavouritesListViewModel : ListParentViewModel() {
 
     init {
         viewModelScope.launch {
-            dbPhotoRepositoryIml.getPhotos().collect { newList ->
+            getPhotosDbUseCase().collect { newList ->
                 _photosEntity.update { newList }
             }
         }

@@ -13,6 +13,8 @@ class PhotoListPagingAdapter(
     private val onSaveButtonPressedListener: (PhotoEntity) -> Unit,
 ) : PagingDataAdapter<PhotoEntity, PhotoViewHolder>(PhotoComparator()) {
 
+    private var favList: List<PhotoEntity> = emptyList()
+
     //НЕ через binding (для разнообразия)
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PhotoViewHolder {
         val layout = when (viewType) {
@@ -25,10 +27,21 @@ class PhotoListPagingAdapter(
     }
 
     override fun onBindViewHolder(holder: PhotoViewHolder, position: Int) {
-        val photoItem = getItem(position)
+        var photoItem = getItem(position)
+
+        for (favPhoto in favList) {
+            if (photoItem?.title == favPhoto.title) {
+                photoItem = favPhoto
+            }
+        }
+
         if (photoItem != null) {
             holder.bind(photoItem, onPhotoClickListener, onSaveButtonPressedListener)
         }
+    }
+
+    fun onChangeFavourites(favList: List<PhotoEntity>) {
+        this.favList = favList
     }
 
     override fun getItemViewType(position: Int): Int {
