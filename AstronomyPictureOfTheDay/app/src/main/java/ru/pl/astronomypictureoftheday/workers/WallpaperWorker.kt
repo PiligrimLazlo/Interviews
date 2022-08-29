@@ -22,15 +22,19 @@ class WallpaperWorker(
         val bitmap = imageManager.loadPhotoFromCache(filePath)
             ?: imageManager.loadBitmapFromNet(photo.imageHdUrl)
             ?: return Result.failure()
-        val scaledImageData = imageManager.scaleBitmapForWallpapers(bitmap)
-        wallpaperManager.setBitmap(
-            scaledImageData.bitmap,
-            scaledImageData.rect,
-            false,
-            WallpaperManager.FLAG_LOCK or WallpaperManager.FLAG_SYSTEM
-        )
+        return try {
+            val scaledImageData = imageManager.scaleBitmapForWallpapers(bitmap)
+            wallpaperManager.setBitmap(
+                scaledImageData.bitmap,
+                scaledImageData.rect,
+                false,
+                WallpaperManager.FLAG_LOCK or WallpaperManager.FLAG_SYSTEM
+            )
 
-        return Result.success()
+            Result.success()
+        } catch (e: Exception) {
+            Result.failure()
+        }
     }
 
     companion object {
