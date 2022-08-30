@@ -3,6 +3,7 @@ package ru.pl.astronomypictureoftheday.presentation.fragments
 import android.Manifest
 import android.annotation.SuppressLint
 import android.content.Context
+import android.content.pm.PackageManager
 import android.graphics.BitmapFactory
 import android.graphics.drawable.Drawable
 import android.os.Bundle
@@ -12,6 +13,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
+import androidx.core.app.ActivityCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
@@ -102,7 +104,11 @@ class PhotoDetailsFragment : Fragment() {
         initialLoadDataIntoScreen()
 
         binding.saveToGalleryBtn.setOnClickListener {
-            requestWriteInMemoryPermission()
+            if (isWriteInMemoryPermissionGranted()) {
+                photoDetailsViewModel.saveImageToPictureFolder()
+            } else {
+                requestWriteInMemoryPermission()
+            }
         }
         binding.setWallpapersBtn.setOnClickListener {
             showWallpaperDialog { position ->
@@ -168,6 +174,13 @@ class PhotoDetailsFragment : Fragment() {
             )
         }
     }
+
+    private fun isWriteInMemoryPermissionGranted(): Boolean =
+        ActivityCompat.checkSelfPermission(
+            requireContext(),
+            Manifest.permission.WRITE_EXTERNAL_STORAGE
+        ) == PackageManager.PERMISSION_GRANTED
+
 
     private fun showRationaleDialog(title: String, message: String) {
         AlertDialog.Builder(requireContext(), R.style.AlertDialogCustom)

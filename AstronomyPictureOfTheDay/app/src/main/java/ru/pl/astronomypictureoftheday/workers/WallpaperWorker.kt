@@ -47,6 +47,7 @@ class WallpaperWorker(
                 .setRequiredNetworkType(NetworkType.CONNECTED)
                 .build()
 
+            //OneTimeWorkRequestBuilder<>()
             return PeriodicWorkRequestBuilder<WallpaperWorker>(PERIOD, TimeUnit.DAYS)
                 .setConstraints(constraints)
                 .setInitialDelay(INITIAL_DELAY, TimeUnit.MINUTES)
