@@ -66,7 +66,9 @@ class PhotoDetailsFragment : Fragment() {
                 return@registerForActivityResult
             }
         }
-        photoDetailsViewModel.saveImageToPictureFolder()
+        viewLifecycleOwner.lifecycleScope.launch {
+            photoDetailsViewModel.saveImageToPictureFolder()
+        }
     }
 
     private val component by lazy {
@@ -105,14 +107,18 @@ class PhotoDetailsFragment : Fragment() {
 
         binding.saveToGalleryBtn.setOnClickListener {
             if (isWriteInMemoryPermissionGranted()) {
-                photoDetailsViewModel.saveImageToPictureFolder()
+                viewLifecycleOwner.lifecycleScope.launch {
+                    photoDetailsViewModel.saveImageToPictureFolder()
+                }
             } else {
                 requestWriteInMemoryPermission()
             }
         }
         binding.setWallpapersBtn.setOnClickListener {
             showWallpaperDialog { position ->
-                photoDetailsViewModel.setWallpapers(position)
+                viewLifecycleOwner.lifecycleScope.launch {
+                    photoDetailsViewModel.setWallpapers(position)
+                }
             }
         }
     }

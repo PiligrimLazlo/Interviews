@@ -10,6 +10,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import ru.pl.astronomypictureoftheday.R
 import ru.pl.astronomypictureoftheday.domain.PhotoEntity
 import ru.pl.astronomypictureoftheday.utils.ImageManager
@@ -27,8 +28,8 @@ class PhotoDetailsViewModel @Inject constructor(
         get() = _detailsState.asStateFlow()
 
 
-    fun saveImageToPictureFolder() {
-        viewModelScope.launch(Dispatchers.IO) {
+    suspend fun saveImageToPictureFolder() {
+        withContext(Dispatchers.IO) {
             _detailsState.update { it.copy(isSavingPhoto = true) }
 
             val filePath = imageManager.getPublicImageFullPathFile(photo.title)
@@ -44,14 +45,12 @@ class PhotoDetailsViewModel @Inject constructor(
                     it.copy(userMessage = application.getString(R.string.connection_error))
                 }
             }
-
-
         }
     }
 
 
-    fun setWallpapers(choicePosition: Int) {
-        viewModelScope.launch(Dispatchers.IO) {
+    suspend fun setWallpapers(choicePosition: Int) {
+        withContext(Dispatchers.IO) {
             _detailsState.update { it.copy(isSettingWallpaper = true) }
 
             val wallpaperManager = WallpaperManager.getInstance(application)
@@ -86,7 +85,6 @@ class PhotoDetailsViewModel @Inject constructor(
                     it.copy(userMessage = application.getString(R.string.connection_error))
                 }
             }
-
         }
     }
 

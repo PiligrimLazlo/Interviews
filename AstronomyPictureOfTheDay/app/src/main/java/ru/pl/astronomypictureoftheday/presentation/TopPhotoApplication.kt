@@ -17,6 +17,7 @@ class TopPhotoApplication: Application(), Configuration.Provider {
     }
 
     override fun onCreate() {
+        //это для того, чтобы Dagger мог заинжектить workerFactory
         component.inject(this)
         super.onCreate()
     }
