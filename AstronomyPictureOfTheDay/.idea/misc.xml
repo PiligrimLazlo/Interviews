@@ -12,7 +12,7 @@
         <entry key="..\:/Android Course/MyProjects/interviews/AstronomyPictureOfTheDay/app/src/main/res/drawable/ic_star_border.xml" value="0.125" />
         <entry key="..\:/Android Course/MyProjects/interviews/AstronomyPictureOfTheDay/app/src/main/res/drawable/main_button_bg.xml" value="0.134" />
         <entry key="..\:/Android Course/MyProjects/interviews/AstronomyPictureOfTheDay/app/src/main/res/layout-v26/fragment_photo_details.xml" value="0.22864583333333333" />
-        <entry key="..\:/Android Course/MyProjects/interviews/AstronomyPictureOfTheDay/app/src/main/res/layout/activity_main.xml" value="0.176" />
+        <entry key="..\:/Android Course/MyProjects/interviews/AstronomyPictureOfTheDay/app/src/main/res/layout/activity_main.xml" value="0.2" />
         <entry key="..\:/Android Course/MyProjects/interviews/AstronomyPictureOfTheDay/app/src/main/res/layout/big_photo_list_item.xml" value="0.2" />
         <entry key="..\:/Android Course/MyProjects/interviews/AstronomyPictureOfTheDay/app/src/main/res/layout/fragment_bottom_nav.xml" value="0.2" />
         <entry key="..\:/Android Course/MyProjects/interviews/AstronomyPictureOfTheDay/app/src/main/res/layout/fragment_favourites.xml" value="0.36311787072243346" />
@@ -26,7 +26,7 @@
         <entry key="..\:/Android Course/MyProjects/interviews/AstronomyPictureOfTheDay/app/src/main/res/layout/switch_theme.xml" value="0.264" />
         <entry key="..\:/Android Course/MyProjects/interviews/AstronomyPictureOfTheDay/app/src/main/res/menu/app_bar_menu.xml" value="0.22760416666666666" />
         <entry key="..\:/Android Course/MyProjects/interviews/AstronomyPictureOfTheDay/app/src/main/res/menu/menu_app_bar.xml" value="0.2" />
-        <entry key="..\:/Android Course/MyProjects/interviews/AstronomyPictureOfTheDay/app/src/main/res/menu/menu_main.xml" value="0.264" />
+        <entry key="..\:/Android Course/MyProjects/interviews/AstronomyPictureOfTheDay/app/src/main/res/menu/menu_main.xml" value="0.536" />
         <entry key="..\:/Android Course/MyProjects/interviews/AstronomyPictureOfTheDay/app/src/main/res/menu/tabs_menu.xml" value="0.4" />
       </map>
     </option>
