@@ -14,6 +14,7 @@ import androidx.recyclerview.widget.GridLayoutManager
 import kotlinx.coroutines.launch
 import ru.pl.astronomypictureoftheday.R
 import ru.pl.astronomypictureoftheday.databinding.FragmentFavouritesBinding
+import ru.pl.astronomypictureoftheday.domain.PhotoEntity
 import ru.pl.astronomypictureoftheday.presentation.TopPhotoApplication
 import ru.pl.astronomypictureoftheday.presentation.adapters.PhotoListFavouritesAdapter
 import ru.pl.astronomypictureoftheday.presentation.viewModels.FavouritesListViewModel
@@ -76,10 +77,19 @@ class FavouritesListFragment : Fragment() {
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 favouritesListViewModel.photosEntity.collect {
+                    updateUi(it)
                     val list = it
                     adapter.submitList(list)
                 }
             }
+        }
+    }
+
+    private fun updateUi(listFavourites: List<PhotoEntity>) {
+        if (listFavourites.isEmpty()) {
+            binding.emptyFavouritesListText.visibility = View.VISIBLE
+        } else {
+            binding.emptyFavouritesListText.visibility = View.GONE
         }
     }
 

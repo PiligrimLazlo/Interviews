@@ -26,5 +26,6 @@
     <string name="wallpapers_choice_both_screens">Both screens</string>
     <string name="ok">OK</string>
     <string name="cancel">Cancel</string>
+    <string name="favourite_list_is_empty">Favourite list is empty.\nAdd something!</string>
 
 </resources>
