@@ -5,7 +5,6 @@ import android.os.Bundle
 import android.util.Log
 import android.view.*
 import androidx.core.util.Pair
-import androidx.core.view.MenuProvider
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -14,10 +13,10 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.paging.LoadState
 import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.datepicker.CalendarConstraints
 import com.google.android.material.datepicker.DateValidatorPointForward
 import com.google.android.material.datepicker.MaterialDatePicker
-import com.google.android.material.switchmaterial.SwitchMaterial
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import ru.pl.astronomypictureoftheday.R
@@ -27,7 +26,7 @@ import ru.pl.astronomypictureoftheday.presentation.adapters.PhotoListPagingAdapt
 import ru.pl.astronomypictureoftheday.presentation.adapters.PhotoLoadStateAdapter
 import ru.pl.astronomypictureoftheday.presentation.viewModels.PagingListViewModel
 import ru.pl.astronomypictureoftheday.presentation.viewModels.PhotoViewModelFactory
-import ru.pl.astronomypictureoftheday.presentation.viewModels.TabsViewModel
+import ru.pl.astronomypictureoftheday.utils.DatePickerValidator
 import ru.pl.astronomypictureoftheday.utils.findTopNavController
 import ru.pl.astronomypictureoftheday.utils.toast
 import java.util.*
@@ -97,8 +96,10 @@ class PagingListFragment : Fragment() {
         //это нужно для синхр с БД
         collectDbPhotoList()
 
-        //create material date picker
+        //create material date picker and setup Button
         materialDatePicker = setUpDateRangePickerDialog()
+        setupFloatingDateButton()
+        setupRecyclerViewWithFloatingButton()
     }
 
     private fun setupPagingAdapter(): PhotoListPagingAdapter {
@@ -140,6 +141,21 @@ class PagingListFragment : Fragment() {
         )
     }
 
+    private fun setupRecyclerViewWithFloatingButton() {
+        binding.photoGrid.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+            override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
+                if (newState == RecyclerView.SCROLL_STATE_IDLE)
+                    binding.selectDateButton.show()
+                super.onScrollStateChanged(recyclerView, newState)
+            }
+
+            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                if (dy > 0 || dy < 0 && binding.selectDateButton.isShown)
+                    binding.selectDateButton.hide()
+            }
+        })
+    }
+
     private fun collectDbPhotoList() {
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
@@ -162,21 +178,26 @@ class PagingListFragment : Fragment() {
     }
 
     private fun setupFloatingDateButton() {
-
+        binding.selectDateButton.setOnClickListener {
+            materialDatePicker.show(childFragmentManager, PICKER_TAG)
+        }
+        binding.selectDateButton.setOnLongClickListener {
+            Log.d(TAG, "long click")
+            true
+        }
     }
 
     private fun setUpDateRangePickerDialog(): MaterialDatePicker<Pair<Long, Long>> {
-
-        val minDateLong = GregorianCalendar(1995, 6, 16).time.time
-
+        val dateValidator = DatePickerValidator()
         val constraints = CalendarConstraints.Builder()
-            .setStart(minDateLong)
-            .setEnd(MaterialDatePicker.todayInUtcMilliseconds())
-            .setValidator(DateValidatorPointForward.from(minDateLong))
+            .setStart(dateValidator.minDateLong)
+            .setEnd(dateValidator.maxDateLong)
+            .setValidator(dateValidator)
             .build()
 
         val materialDatePicker = MaterialDatePicker.Builder.dateRangePicker()
             .setTitleText(getString(R.string.select_date))
+            .setTheme(R.style.date_picker_style)
             .setCalendarConstraints(constraints)
             .build()
 
@@ -184,14 +205,15 @@ class PagingListFragment : Fragment() {
 
         }
 
-        //todo max date - make today if selected forward
-        //todo Need to pass date to list fragment somehow
-
         materialDatePicker.addOnPositiveButtonClickListener {
             Log.d(TAG, "${Date(materialDatePicker.selection?.first!!)} : ${Date(materialDatePicker.selection?.second!!)}")
         }
 
         return materialDatePicker
+    }
+
+    companion object {
+        private const val PICKER_TAG = "tag"
     }
 
 

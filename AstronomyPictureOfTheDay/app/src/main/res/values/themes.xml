@@ -63,5 +63,10 @@
         <item name="android:textColorSecondary">@color/white</item>
     </style>
 
+    <style name="date_picker_style" parent="@style/ThemeOverlay.MaterialComponents.MaterialCalendar.Fullscreen">>
+        <item name="android:colorPrimary">@color/white</item>
+        <item name="colorOnPrimary">@color/white</item>
+    </style>
+
 
 </resources>
