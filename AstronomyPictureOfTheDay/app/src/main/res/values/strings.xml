@@ -29,5 +29,6 @@
     <string name="favourite_list_is_empty">Favourite list is empty.\nAdd something!</string>
     <string name="select_date_range">Select date range</string>
     <string name="select_date">Select date</string>
+    <string name="select_date_range_btn_description">Select date range for top photos</string>
 
 </resources>

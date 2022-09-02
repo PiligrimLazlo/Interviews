@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.util.Log
 import android.view.*
 import androidx.appcompat.app.AppCompatDelegate
+import androidx.core.util.Pair
 import androidx.core.view.MenuProvider
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -26,6 +27,7 @@ import ru.pl.astronomypictureoftheday.presentation.viewModels.PhotoViewModelFact
 import ru.pl.astronomypictureoftheday.presentation.viewModels.TabsViewModel
 import ru.pl.astronomypictureoftheday.presentation.viewModels.TabsViewModel.Companion.THEME_DARK
 import ru.pl.astronomypictureoftheday.presentation.viewModels.TabsViewModel.Companion.THEME_LIGHT
+import ru.pl.astronomypictureoftheday.utils.findTopNavController
 import java.time.LocalDateTime
 import java.util.*
 import javax.inject.Inject
@@ -40,6 +42,7 @@ class TabsFragment : Fragment() {
         get() = checkNotNull(_binding) {
             getString(R.string.binding_null_error)
         }
+
 
     @Inject
     lateinit var photoViewModelFactory: PhotoViewModelFactory
@@ -134,9 +137,6 @@ class TabsFragment : Fragment() {
                         menuItem.isChecked = !menuItem.isChecked
                         tabsViewModel.setAutoWallpapersEnabled(menuItem.isChecked)
                     }
-                    R.id.select_date_range -> {
-                        setUpDateRangePickerDialog()
-                    }
                 }
 
                 return true
@@ -145,30 +145,7 @@ class TabsFragment : Fragment() {
         }, viewLifecycleOwner, Lifecycle.State.STARTED)
     }
 
-    private fun setUpDateRangePickerDialog() {
 
-        val minDateLong = GregorianCalendar(1995, 6, 16).time.time
-
-        val constraints = CalendarConstraints.Builder()
-            .setStart(minDateLong)
-            .setEnd(MaterialDatePicker.todayInUtcMilliseconds())
-            .setValidator(DateValidatorPointForward.from(minDateLong))
-            .build()
-
-        val materialDatePicker = MaterialDatePicker.Builder.dateRangePicker()
-            .setTitleText(getString(R.string.select_date))
-            .setCalendarConstraints(constraints)
-            .build()
-
-        //todo max date - make today if selected forward
-        //todo Need to pass date to list fragment somehow
-
-        materialDatePicker.addOnPositiveButtonClickListener {
-            Log.d(TAG, "${Date(materialDatePicker.selection?.first!!)} : ${Date(materialDatePicker.selection?.second!!)}")
-        }
-
-        materialDatePicker.show(childFragmentManager, "tag")
-    }
 
     override fun onDestroyView() {
         super.onDestroyView()

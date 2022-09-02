@@ -11,8 +11,4 @@
         android:id="@+id/switch_set_wallpaper"
         android:checkable="true"
         android:title="@string/switch_set_wallpaper" />
-
-    <item
-        android:id="@+id/select_date_range"
-        android:title="@string/select_date_range" />
 </menu>

@@ -2,9 +2,10 @@ package ru.pl.astronomypictureoftheday.presentation.fragments
 
 import android.content.Context
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.util.Log
+import android.view.*
+import androidx.core.util.Pair
+import androidx.core.view.MenuProvider
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -13,6 +14,10 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.paging.LoadState
 import androidx.recyclerview.widget.GridLayoutManager
+import com.google.android.material.datepicker.CalendarConstraints
+import com.google.android.material.datepicker.DateValidatorPointForward
+import com.google.android.material.datepicker.MaterialDatePicker
+import com.google.android.material.switchmaterial.SwitchMaterial
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import ru.pl.astronomypictureoftheday.R
@@ -22,8 +27,10 @@ import ru.pl.astronomypictureoftheday.presentation.adapters.PhotoListPagingAdapt
 import ru.pl.astronomypictureoftheday.presentation.adapters.PhotoLoadStateAdapter
 import ru.pl.astronomypictureoftheday.presentation.viewModels.PagingListViewModel
 import ru.pl.astronomypictureoftheday.presentation.viewModels.PhotoViewModelFactory
+import ru.pl.astronomypictureoftheday.presentation.viewModels.TabsViewModel
 import ru.pl.astronomypictureoftheday.utils.findTopNavController
 import ru.pl.astronomypictureoftheday.utils.toast
+import java.util.*
 import javax.inject.Inject
 
 private const val TAG = "PhotoListFragment";
@@ -35,6 +42,8 @@ class PagingListFragment : Fragment() {
         get() = checkNotNull(_binding) {
             getString(R.string.binding_null_error)
         }
+
+    private lateinit var materialDatePicker: MaterialDatePicker<Pair<Long, Long>>
 
     @Inject
     lateinit var photoViewModelFactory: PhotoViewModelFactory
@@ -87,6 +96,9 @@ class PagingListFragment : Fragment() {
 
         //это нужно для синхр с БД
         collectDbPhotoList()
+
+        //create material date picker
+        materialDatePicker = setUpDateRangePickerDialog()
     }
 
     private fun setupPagingAdapter(): PhotoListPagingAdapter {
@@ -147,6 +159,39 @@ class PagingListFragment : Fragment() {
             }
         }
         return layoutManger
+    }
+
+    private fun setupFloatingDateButton() {
+
+    }
+
+    private fun setUpDateRangePickerDialog(): MaterialDatePicker<Pair<Long, Long>> {
+
+        val minDateLong = GregorianCalendar(1995, 6, 16).time.time
+
+        val constraints = CalendarConstraints.Builder()
+            .setStart(minDateLong)
+            .setEnd(MaterialDatePicker.todayInUtcMilliseconds())
+            .setValidator(DateValidatorPointForward.from(minDateLong))
+            .build()
+
+        val materialDatePicker = MaterialDatePicker.Builder.dateRangePicker()
+            .setTitleText(getString(R.string.select_date))
+            .setCalendarConstraints(constraints)
+            .build()
+
+        materialDatePicker.addOnPositiveButtonClickListener {
+
+        }
+
+        //todo max date - make today if selected forward
+        //todo Need to pass date to list fragment somehow
+
+        materialDatePicker.addOnPositiveButtonClickListener {
+            Log.d(TAG, "${Date(materialDatePicker.selection?.first!!)} : ${Date(materialDatePicker.selection?.second!!)}")
+        }
+
+        return materialDatePicker
     }
 
 
