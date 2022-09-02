@@ -21,7 +21,7 @@
     <fragment
         android:id="@+id/photoDetailsFragment"
         android:name="ru.pl.astronomypictureoftheday.presentation.fragments.PhotoDetailsFragment"
-        android:label="PhotoDetailsFragment"
+        android:label="{title}"
         tools:layout="@layout/fragment_photo_details">
         <argument
             android:name="photoEntity"
