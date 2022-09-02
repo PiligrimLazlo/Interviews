@@ -15,7 +15,6 @@ import androidx.paging.LoadState
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.datepicker.CalendarConstraints
-import com.google.android.material.datepicker.DateValidatorPointForward
 import com.google.android.material.datepicker.MaterialDatePicker
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
@@ -93,8 +92,7 @@ class PagingListFragment : Fragment() {
         //paging center progress and btn visibility
         collectAdapterLoadState(pagingAdapter)
 
-        //это нужно для синхр с БД
-        collectDbPhotoList()
+        collectViewModelState()
 
         //create material date picker and setup Button
         materialDatePicker = setUpDateRangePickerDialog()
@@ -156,11 +154,11 @@ class PagingListFragment : Fragment() {
         })
     }
 
-    private fun collectDbPhotoList() {
+    private fun collectViewModelState() {
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                pagingListViewModel.dbPhotoListState.collect {
-                    pagingAdapter.onChangeFavourites(it)
+                pagingListViewModel.dBPhotosState.collect {
+                    pagingAdapter.onChangeFavourites(it.dbPhotoList)
                 }
             }
         }
@@ -180,9 +178,13 @@ class PagingListFragment : Fragment() {
     private fun setupFloatingDateButton() {
         binding.selectDateButton.setOnClickListener {
             materialDatePicker.show(childFragmentManager, PICKER_TAG)
+            materialDatePicker.addOnPositiveButtonClickListener {
+                pagingListViewModel.onDateSelected(it.first to it.second)
+            }
         }
         binding.selectDateButton.setOnLongClickListener {
             Log.d(TAG, "long click")
+            pagingListViewModel.onDateSelectedReset()
             true
         }
     }

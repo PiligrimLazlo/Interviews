@@ -10,7 +10,5 @@ interface NetPhotoRepository {
 
     fun fetchPhotos(): Flow<PagingData<PhotoEntity>>
 
-    //todo доределать paging source, чтобы он мог работать не только с бесконечной датой, как сейчас
-    //todo а так же с диапазоном дат
-    //fun fetchPhotos(startDate: String, endDate: String): Flow<List<PhotoEntity>>
+    fun fetchPhotos(startDate: Long, endDate: Long): Flow<PagingData<PhotoEntity>>
 }
