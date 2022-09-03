@@ -30,5 +30,7 @@
     <string name="select_date_range">Select date range</string>
     <string name="select_date">Select date</string>
     <string name="select_date_range_btn_description">Select date range for top photos</string>
+    <string name="translate">Translate</string>
+    <string name="tanslation_detected_message">Russian language detected. Do you want to download ML kit for translation? (30mb)</string>
 
 </resources>

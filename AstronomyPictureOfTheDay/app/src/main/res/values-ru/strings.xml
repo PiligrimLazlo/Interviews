@@ -29,5 +29,7 @@
     <string name="select_date_range">Выберите диапазон дат</string>
     <string name="select_date">Выберите дату</string>
     <string name="select_date_range_btn_description">Выберите диапазон дат для фотографий</string>
+    <string name="translate">Перевод</string>
+    <string name="tanslation_detected_message">Обнаружен русский язык в системе. Хотите скачать автоперевод описания? (30мб)</string>
 
 </resources>

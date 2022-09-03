@@ -223,8 +223,8 @@ class PhotoDetailsFragment : Fragment() {
 
     private fun showTranslateDialog() {
         AlertDialog.Builder(requireContext(), R.style.AlertDialogCustom)
-            .setTitle("Перевод")
-            .setMessage("Обнаружен русский язык в системе. Хотите скачать автоперевод описания? (30мб)")
+            .setTitle(getString(R.string.translate))
+            .setMessage(getString(R.string.tanslation_detected_message))
             .setCancelable(false)
             .setNegativeButton(getString(R.string.cancel)) { dialog, _ ->
                 photoDetailsViewModel.translateNegativePressed()

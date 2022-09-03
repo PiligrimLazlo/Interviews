@@ -31,7 +31,7 @@ import ru.pl.astronomypictureoftheday.utils.toast
 import java.util.*
 import javax.inject.Inject
 
-private const val TAG = "PhotoListFragment";
+private const val TAG = "PhotoListFragment"
 
 class PagingListFragment : Fragment() {
 
@@ -202,10 +202,6 @@ class PagingListFragment : Fragment() {
             .setTheme(R.style.date_picker_style)
             .setCalendarConstraints(constraints)
             .build()
-
-        materialDatePicker.addOnPositiveButtonClickListener {
-
-        }
 
         materialDatePicker.addOnPositiveButtonClickListener {
             Log.d(TAG, "${Date(materialDatePicker.selection?.first!!)} : ${Date(materialDatePicker.selection?.second!!)}")
