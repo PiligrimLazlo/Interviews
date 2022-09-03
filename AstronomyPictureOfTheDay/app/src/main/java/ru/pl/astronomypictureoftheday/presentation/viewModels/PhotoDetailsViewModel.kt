@@ -5,27 +5,40 @@ import android.app.WallpaperManager
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import ru.pl.astronomypictureoftheday.R
 import ru.pl.astronomypictureoftheday.domain.PhotoEntity
+import ru.pl.astronomypictureoftheday.domain.usecase.StoredTranslateDialogShownUseCase
 import ru.pl.astronomypictureoftheday.utils.ImageManager
+import ru.pl.astronomypictureoftheday.utils.LanguageTranslator
 import javax.inject.Inject
 
+private const val TAG = "PhotoDetailsViewModel"
 
 class PhotoDetailsViewModel @Inject constructor(
     private val application: Application,
     private val photo: PhotoEntity,
-    private val imageManager: ImageManager
+    private val imageManager: ImageManager,
+    private val storedTranslateDialogShownUseCase: StoredTranslateDialogShownUseCase
 ) : ViewModel() {
     private val _detailsState: MutableStateFlow<PhotoDetailsState> =
         MutableStateFlow(PhotoDetailsState())
     val detailsState: StateFlow<PhotoDetailsState>
         get() = _detailsState.asStateFlow()
+
+    private val languageTranslator: LanguageTranslator by lazy {
+        LanguageTranslator()
+    }
+
+    init {
+        viewModelScope.launch {
+            storedTranslateDialogShownUseCase.storedTranslateDialogShown.collect { shown ->
+                _detailsState.update { it.copy(isTranslateDialogShown = shown) }
+            }
+        }
+    }
 
 
     suspend fun saveImageToPictureFolder() {
@@ -94,11 +107,46 @@ class PhotoDetailsViewModel @Inject constructor(
         }
     }
 
+    fun translateNegativePressed() {
+        viewModelScope.launch {
+            storedTranslateDialogShownUseCase.setTranslateDialogShown(true)
+        }
+    }
+
+    fun translatePositivePressed() {
+        viewModelScope.launch {
+            storedTranslateDialogShownUseCase.setTranslateDialogShown(true)
+
+            languageTranslator.downloadModel()
+            onLoadDetailsWithRuLocale()
+        }
+    }
+
+    fun onLoadDetailsWithRuLocale() {
+        viewModelScope.launch {
+            val downloaded = languageTranslator.isRuModelDownloaded()
+
+            if (downloaded) {
+                val translatedText = languageTranslator.translate(photo.explanation)
+                _detailsState.update { it.copy(translatedDescription = translatedText) }
+            }
+        }
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        languageTranslator.close()
+    }
+
 }
 
 
 data class PhotoDetailsState(
     val isSavingPhoto: Boolean = false,
     val isSettingWallpaper: Boolean = false,
+
+    val isTranslateDialogShown: Boolean = false,
+    val translatedDescription: String? = null,
+
     val userMessage: String? = null
 )

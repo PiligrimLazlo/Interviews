@@ -2,7 +2,7 @@
     <string name="app_name">Picture Of The Day</string>
     <string name="top_photo_image_description">Top Photo Image</string>
     <string name="dark_mode">Dark mode</string>
-    <string name="binding_null_error">Cannot access binding because it is null. Is the view visible?</string>
+    <string name="binding_null_error" translatable="false">Cannot access binding because it is null. Is the view visible?</string>
     <string name="retry">Retry</string>
     <string name="save_btn_text">Save To Gallery</string>
     <string name="set_wallpapers_text">Set Wallpapers</string>
@@ -14,7 +14,7 @@
     <string name="connection_error">Connection error</string>
     <string name="permission_not_granted_error">Permission did not received!</string>
     <string name="removed_from_favourites">removed from favourites</string>
-    <string name="view_type_exception">View type must be 0 or 1</string>
+    <string name="view_type_exception" translatable="false">View type must be 0 or 1</string>
     <string name="photos">All photos</string>
     <string name="favourites">Favourites</string>
     <string name="downloading_failed">Downloading failed</string>

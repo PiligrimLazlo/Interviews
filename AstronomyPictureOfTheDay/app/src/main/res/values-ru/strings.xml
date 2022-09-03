@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Картинка дня</string>
+    <string name="top_photo_image_description">Топ фото</string>
+    <string name="dark_mode">Темный режим</string>
+    <string name="retry">Перезагрузить</string>
+    <string name="save_btn_text">Сохранить в галерею</string>
+    <string name="set_wallpapers_text">Установить обои</string>
+    <string name="wallpapers_set">Обои установлены</string>
+    <string name="successfully_saved_picture">Сохранено в папке \"Pictures\"</string>
+    <string name="picture_saved">Картинка сохранена</string>
+    <string name="added_to_favourites">Добавлено в избранное</string>
+    <string name="error">Ошибка</string>
+    <string name="connection_error">Ошибка соединения</string>
+    <string name="permission_not_granted_error">Разрешение не предоставлено!</string>
+    <string name="removed_from_favourites">Удалено из избранных</string>
+    <string name="photos">Все фото</string>
+    <string name="favourites">Избранные</string>
+    <string name="downloading_failed">Загрузка не удалась</string>
+    <string name="no_internet_message">Для этого нужен интернет</string>
+    <string name="black_theme">Темная тема</string>
+    <string name="switch_set_wallpaper">Новые обои каждый день</string>
+    <string name="wallpapers_choice_home_screen">Домашний экран</string>
+    <string name="wallpapers_choice_lock_screen">Экран блокировки</string>
+    <string name="wallpapers_choice_both_screens">Оба экрана</string>
+    <string name="ok">ОК</string>
+    <string name="cancel">Отмена</string>
+    <string name="favourite_list_is_empty">Список избранного пуст.\nДобавьте что-нибудь!</string>
+    <string name="select_date_range">Выберите диапазон дат</string>
+    <string name="select_date">Выберите дату</string>
+    <string name="select_date_range_btn_description">Выберите диапазон дат для фотографий</string>
+
+</resources>

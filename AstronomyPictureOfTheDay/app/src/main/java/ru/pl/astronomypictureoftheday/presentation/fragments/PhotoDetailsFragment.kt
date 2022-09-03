@@ -8,6 +8,7 @@ import android.graphics.BitmapFactory
 import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.text.Layout
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -35,7 +36,10 @@ import ru.pl.astronomypictureoftheday.presentation.viewModels.PhotoDetailsViewMo
 import ru.pl.astronomypictureoftheday.presentation.viewModels.PhotoViewModelFactory
 import ru.pl.astronomypictureoftheday.utils.toast
 import java.io.File
+import java.util.*
 import javax.inject.Inject
+
+private const val TAG = "PhotoDetailsFragment"
 
 class PhotoDetailsFragment : Fragment() {
 
@@ -82,10 +86,6 @@ class PhotoDetailsFragment : Fragment() {
         photoEntity = args.photoEntity
         component.inject(this)
         super.onAttach(context)
-    }
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
     }
 
     override fun onCreateView(
@@ -143,7 +143,12 @@ class PhotoDetailsFragment : Fragment() {
 
         binding.apply {
             descriptionDetail.justificationMode = Layout.JUSTIFICATION_MODE_INTER_WORD
+
             descriptionDetail.text = photoEntity.explanation
+
+            if (Locale.getDefault().displayName.contains(RU_LOCALE)) {
+                photoDetailsViewModel.onLoadDetailsWithRuLocale()
+            }
 
             val path = photoEntity.cachePhotoPath
             Glide.with(root.context)
@@ -216,6 +221,23 @@ class PhotoDetailsFragment : Fragment() {
             .show()
     }
 
+    private fun showTranslateDialog() {
+        AlertDialog.Builder(requireContext(), R.style.AlertDialogCustom)
+            .setTitle("Перевод")
+            .setMessage("Обнаружен русский язык в системе. Хотите скачать автоперевод описания? (30мб)")
+            .setCancelable(false)
+            .setNegativeButton(getString(R.string.cancel)) { dialog, _ ->
+                photoDetailsViewModel.translateNegativePressed()
+                dialog.dismiss()
+            }
+            .setPositiveButton(getString(R.string.ok)) { dialog, which ->
+                photoDetailsViewModel.translatePositivePressed()
+                dialog.dismiss()
+            }
+            .create()
+            .show()
+    }
+
 
     private fun updateUi(state: PhotoDetailsState) {
         binding.apply {
@@ -233,9 +255,28 @@ class PhotoDetailsFragment : Fragment() {
                 saveToGalleryBtn.visibility = View.VISIBLE
                 progressBarSave.visibility = View.INVISIBLE
             }
+
             state.userMessage?.let { toast(it) }
             photoDetailsViewModel.userMessageShown()
+
+
+            //показываем диалог если не нажимал cancel и ок, то есть первый раз
+            if (Locale.getDefault().displayName.contains(RU_LOCALE) &&
+                !state.isTranslateDialogShown
+            ) {
+                showTranslateDialog()
+            }
+            state.translatedDescription?.let {
+                Log.d(TAG, it)
+                binding.descriptionDetail.text = it
+            }
+
         }
+    }
+
+
+    companion object {
+        private val RU_LOCALE = Regex("[ruRUруРУ]")
     }
 }
 
