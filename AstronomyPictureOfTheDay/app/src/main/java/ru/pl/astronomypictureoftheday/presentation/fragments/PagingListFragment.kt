@@ -23,8 +23,8 @@ import ru.pl.astronomypictureoftheday.databinding.FragmentPhotoListBinding
 import ru.pl.astronomypictureoftheday.presentation.TopPhotoApplication
 import ru.pl.astronomypictureoftheday.presentation.adapters.PhotoListPagingAdapter
 import ru.pl.astronomypictureoftheday.presentation.adapters.PhotoLoadStateAdapter
-import ru.pl.astronomypictureoftheday.presentation.viewModels.PagingListViewModel
-import ru.pl.astronomypictureoftheday.presentation.viewModels.PhotoViewModelFactory
+import ru.pl.astronomypictureoftheday.presentation.viewmodels.PagingListViewModel
+import ru.pl.astronomypictureoftheday.presentation.viewmodels.PhotoViewModelFactory
 import ru.pl.astronomypictureoftheday.utils.DatePickerValidator
 import ru.pl.astronomypictureoftheday.utils.findTopNavController
 import ru.pl.astronomypictureoftheday.utils.toast

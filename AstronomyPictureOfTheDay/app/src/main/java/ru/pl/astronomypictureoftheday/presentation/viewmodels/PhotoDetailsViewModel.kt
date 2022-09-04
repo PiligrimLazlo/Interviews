@@ -1,4 +1,4 @@
-package ru.pl.astronomypictureoftheday.presentation.viewModels
+package ru.pl.astronomypictureoftheday.presentation.viewmodels
 
 import android.app.Application
 import android.app.WallpaperManager

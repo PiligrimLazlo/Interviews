@@ -1,4 +1,4 @@
-package ru.pl.astronomypictureoftheday.presentation.viewModels
+package ru.pl.astronomypictureoftheday.presentation.viewmodels
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope

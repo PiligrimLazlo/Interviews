@@ -17,8 +17,8 @@ import ru.pl.astronomypictureoftheday.databinding.FragmentFavouritesBinding
 import ru.pl.astronomypictureoftheday.domain.PhotoEntity
 import ru.pl.astronomypictureoftheday.presentation.TopPhotoApplication
 import ru.pl.astronomypictureoftheday.presentation.adapters.PhotoListFavouritesAdapter
-import ru.pl.astronomypictureoftheday.presentation.viewModels.FavouritesListViewModel
-import ru.pl.astronomypictureoftheday.presentation.viewModels.PhotoViewModelFactory
+import ru.pl.astronomypictureoftheday.presentation.viewmodels.FavouritesListViewModel
+import ru.pl.astronomypictureoftheday.presentation.viewmodels.PhotoViewModelFactory
 import ru.pl.astronomypictureoftheday.utils.findTopNavController
 import ru.pl.astronomypictureoftheday.utils.toast
 import javax.inject.Inject

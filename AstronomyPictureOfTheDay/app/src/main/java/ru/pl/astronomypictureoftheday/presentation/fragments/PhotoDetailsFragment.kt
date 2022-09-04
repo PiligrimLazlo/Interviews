@@ -8,7 +8,6 @@ import android.graphics.BitmapFactory
 import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.text.Layout
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -31,12 +30,11 @@ import ru.pl.astronomypictureoftheday.R
 import ru.pl.astronomypictureoftheday.domain.PhotoEntity
 import ru.pl.astronomypictureoftheday.databinding.FragmentPhotoDetailsBinding
 import ru.pl.astronomypictureoftheday.presentation.TopPhotoApplication
-import ru.pl.astronomypictureoftheday.presentation.viewModels.PhotoDetailsState
-import ru.pl.astronomypictureoftheday.presentation.viewModels.PhotoDetailsViewModel
-import ru.pl.astronomypictureoftheday.presentation.viewModels.PhotoViewModelFactory
+import ru.pl.astronomypictureoftheday.presentation.viewmodels.PhotoDetailsState
+import ru.pl.astronomypictureoftheday.presentation.viewmodels.PhotoDetailsViewModel
+import ru.pl.astronomypictureoftheday.presentation.viewmodels.PhotoViewModelFactory
 import ru.pl.astronomypictureoftheday.utils.toast
 import java.io.File
-import java.util.*
 import javax.inject.Inject
 
 private const val TAG = "PhotoDetailsFragment"

@@ -1,4 +1,4 @@
-package ru.pl.astronomypictureoftheday.presentation.viewModels
+package ru.pl.astronomypictureoftheday.presentation.viewmodels
 
 import android.app.Application
 import android.util.Log
@@ -11,7 +11,7 @@ import kotlinx.coroutines.launch
 import ru.pl.astronomypictureoftheday.domain.usecase.StoredAutoWallpPrefsUseCase
 import ru.pl.astronomypictureoftheday.domain.usecase.StoredThemePrefsUseCase
 import ru.pl.astronomypictureoftheday.domain.usecase.StoredTranslateTurnedOnUseCase
-import ru.pl.astronomypictureoftheday.presentation.viewModels.TabsViewModel.Companion.THEME_LIGHT
+import ru.pl.astronomypictureoftheday.presentation.viewmodels.TabsViewModel.Companion.THEME_LIGHT
 import ru.pl.astronomypictureoftheday.workers.WallpaperWorker
 import javax.inject.Inject
 
