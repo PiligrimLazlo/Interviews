@@ -10,17 +10,19 @@ import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import ru.pl.astronomypictureoftheday.domain.usecase.StoredAutoWallpPrefsUseCase
 import ru.pl.astronomypictureoftheday.domain.usecase.StoredThemePrefsUseCase
+import ru.pl.astronomypictureoftheday.domain.usecase.StoredTranslateTurnedOnUseCase
 import ru.pl.astronomypictureoftheday.presentation.viewModels.TabsViewModel.Companion.THEME_LIGHT
 import ru.pl.astronomypictureoftheday.workers.WallpaperWorker
 import javax.inject.Inject
 
-private const val TAG = "TabsViewModel";
+private const val TAG = "TabsViewModel"
 
 
 class TabsViewModel @Inject constructor(
     private val application: Application,
     private val storedThemePrefsUseCase: StoredThemePrefsUseCase,
-    private val storedAutoWallpPrefsUseCase: StoredAutoWallpPrefsUseCase
+    private val storedAutoWallpPrefsUseCase: StoredAutoWallpPrefsUseCase,
+    private val storedTranslateTurnedOnUseCase: StoredTranslateTurnedOnUseCase
 ) : ViewModel() {
 
     private val _tabsState: MutableStateFlow<TabsUiState> = MutableStateFlow(TabsUiState())
@@ -33,6 +35,8 @@ class TabsViewModel @Inject constructor(
         collectTheme()
         //собираем работает ли воркер и автоустанавливает обои
         collectIsAutoWallpEnabled()
+        //установлен ли автоперевод деталей
+        collectIsAutoTranslateEnabled()
     }
 
     private fun collectTheme() {
@@ -58,6 +62,20 @@ class TabsViewModel @Inject constructor(
                     }
                 } catch (ex: Exception) {
                     Log.e(TAG, "Failed to load isAutoWallpapersEnabled", ex)
+                }
+            }
+        }
+    }
+
+    private fun collectIsAutoTranslateEnabled() {
+        viewModelScope.launch {
+            storedTranslateTurnedOnUseCase.storedAutoTranslateEnabled.collectLatest { storedBool ->
+                try {
+                    _tabsState.update { oldState ->
+                        oldState.copy(isAutoTranslateEnabled = storedBool)
+                    }
+                } catch (ex: Exception) {
+                    Log.e(TAG, "Failed to load isAutoTranslateEnabled", ex)
                 }
             }
         }
@@ -90,6 +108,12 @@ class TabsViewModel @Inject constructor(
         }
     }
 
+    fun setAutoTranslateEnabled(isEnabled: Boolean) {
+        viewModelScope.launch {
+            storedTranslateTurnedOnUseCase.setAutoTranslateEnabled(isEnabled)
+        }
+    }
+
     companion object {
         const val THEME_LIGHT = 0
         const val THEME_DARK = 1
@@ -98,5 +122,6 @@ class TabsViewModel @Inject constructor(
 
 data class TabsUiState(
     val theme: Int = THEME_LIGHT,
-    val isAutoWallpapersEnabled: Boolean = false
+    val isAutoWallpapersEnabled: Boolean = false,
+    val isAutoTranslateEnabled: Boolean = false
 )

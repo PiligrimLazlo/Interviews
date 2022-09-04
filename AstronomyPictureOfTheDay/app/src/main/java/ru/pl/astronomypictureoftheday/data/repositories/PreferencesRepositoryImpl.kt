@@ -34,20 +34,20 @@ class PreferencesRepositoryImpl private constructor(
         }
     }
 
-    override val storedTranslateDialogAlreadyShown: Flow<Boolean> = dataStore.data.map {
-        it[TRANSLATE_SHOWN] ?: false
+    override val storedTranslationTurnedOn: Flow<Boolean> = dataStore.data.map {
+        it[TRANSLATE_TURNED_ON] ?: false
     }.distinctUntilChanged()
 
-    override suspend fun setTranslateDialogAlreadyShown(isShown: Boolean) {
+    override suspend fun setTranslationTurnedOn(isShown: Boolean) {
         dataStore.edit {
-            it[TRANSLATE_SHOWN] = isShown
+            it[TRANSLATE_TURNED_ON] = isShown
         }
     }
 
     companion object {
         private val THEME_KEY = intPreferencesKey("theme_key")
         private val AUTO_WALLP_KEY = booleanPreferencesKey("wallp_key")
-        private val TRANSLATE_SHOWN = booleanPreferencesKey("translate_shown")
+        private val TRANSLATE_TURNED_ON = booleanPreferencesKey("translate_turned_on")
 
         private var INSTANCE: PreferencesRepositoryImpl? = null
 

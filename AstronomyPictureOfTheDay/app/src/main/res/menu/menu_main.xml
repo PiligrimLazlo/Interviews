@@ -11,4 +11,9 @@
         android:id="@+id/switch_set_wallpaper"
         android:checkable="true"
         android:title="@string/switch_set_wallpaper" />
+
+    <item
+        android:id="@+id/enable_auto_translate"
+        android:checkable="true"
+        android:title="@string/turn_on_auto_translate" />
 </menu>

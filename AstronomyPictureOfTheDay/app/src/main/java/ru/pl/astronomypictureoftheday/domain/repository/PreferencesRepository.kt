@@ -9,6 +9,6 @@ interface PreferencesRepository {
     val storedAutoWallpEnabled: Flow<Boolean>
     suspend fun setAutoWallpEnabled(isEnabled: Boolean)
 
-    val storedTranslateDialogAlreadyShown: Flow<Boolean>
-    suspend fun setTranslateDialogAlreadyShown(isShown: Boolean)
+    val storedTranslationTurnedOn: Flow<Boolean>
+    suspend fun setTranslationTurnedOn(isShown: Boolean)
 }

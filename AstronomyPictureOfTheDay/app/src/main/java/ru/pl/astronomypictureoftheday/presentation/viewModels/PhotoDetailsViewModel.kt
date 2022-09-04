@@ -10,7 +10,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import ru.pl.astronomypictureoftheday.R
 import ru.pl.astronomypictureoftheday.domain.PhotoEntity
-import ru.pl.astronomypictureoftheday.domain.usecase.StoredTranslateDialogShownUseCase
+import ru.pl.astronomypictureoftheday.domain.usecase.StoredTranslateTurnedOnUseCase
 import ru.pl.astronomypictureoftheday.utils.ImageManager
 import ru.pl.astronomypictureoftheday.utils.LanguageTranslator
 import javax.inject.Inject
@@ -21,7 +21,7 @@ class PhotoDetailsViewModel @Inject constructor(
     private val application: Application,
     private val photo: PhotoEntity,
     private val imageManager: ImageManager,
-    private val storedTranslateDialogShownUseCase: StoredTranslateDialogShownUseCase
+    private val storedTranslateTurnedOnUseCase: StoredTranslateTurnedOnUseCase
 ) : ViewModel() {
     private val _detailsState: MutableStateFlow<PhotoDetailsState> =
         MutableStateFlow(PhotoDetailsState())
@@ -34,8 +34,9 @@ class PhotoDetailsViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            storedTranslateDialogShownUseCase.storedTranslateDialogShown.collect { shown ->
-                _detailsState.update { it.copy(isTranslateDialogShown = shown) }
+            storedTranslateTurnedOnUseCase.storedAutoTranslateEnabled.collect { isTurnedOn ->
+                _detailsState.update { it.copy(isTranslateTurnedOn = isTurnedOn) }
+                if (isTurnedOn) loadTranslation()
             }
         }
     }
@@ -107,29 +108,10 @@ class PhotoDetailsViewModel @Inject constructor(
         }
     }
 
-    fun translateNegativePressed() {
+    private fun loadTranslation() {
         viewModelScope.launch {
-            storedTranslateDialogShownUseCase.setTranslateDialogShown(true)
-        }
-    }
-
-    fun translatePositivePressed() {
-        viewModelScope.launch {
-            storedTranslateDialogShownUseCase.setTranslateDialogShown(true)
-
-            languageTranslator.downloadModel()
-            onLoadDetailsWithRuLocale()
-        }
-    }
-
-    fun onLoadDetailsWithRuLocale() {
-        viewModelScope.launch {
-            val downloaded = languageTranslator.isRuModelDownloaded()
-
-            if (downloaded) {
                 val translatedText = languageTranslator.translate(photo.explanation)
                 _detailsState.update { it.copy(translatedDescription = translatedText) }
-            }
         }
     }
 
@@ -145,7 +127,8 @@ data class PhotoDetailsState(
     val isSavingPhoto: Boolean = false,
     val isSettingWallpaper: Boolean = false,
 
-    val isTranslateDialogShown: Boolean = false,
+    //val isTranslateDialogShown: Boolean = false,
+    val isTranslateTurnedOn: Boolean = false,
     val translatedDescription: String? = null,
 
     val userMessage: String? = null

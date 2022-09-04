@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.util.Log
 import android.view.*
 import androidx.appcompat.app.AppCompatDelegate
+import androidx.core.content.ContextCompat
 import androidx.core.util.Pair
 import androidx.core.view.MenuProvider
 import androidx.fragment.app.Fragment
@@ -51,6 +52,7 @@ class TabsFragment : Fragment() {
     }
     private var currentTheme by Delegates.notNull<Int>()
     private var checkedAutoWallpapersSet by Delegates.notNull<Boolean>()
+    private var checkedAutoAutoTranslate by Delegates.notNull<Boolean>()
 
     private val component by lazy {
         (requireActivity().application as TopPhotoApplication)
@@ -101,6 +103,7 @@ class TabsFragment : Fragment() {
                     AppCompatDelegate.setDefaultNightMode(themeMode)
 
                     checkedAutoWallpapersSet = state.isAutoWallpapersEnabled
+                    checkedAutoAutoTranslate = state.isAutoTranslateEnabled
                     Log.d(TAG, "tabs state changed $checkedAutoWallpapersSet")
                 }
             }
@@ -129,6 +132,9 @@ class TabsFragment : Fragment() {
                 val checkIsAutoWallpEnable = menu.findItem(R.id.switch_set_wallpaper)
                 checkIsAutoWallpEnable.isChecked = checkedAutoWallpapersSet
 
+                val autoTranslateItem = menu.findItem(R.id.enable_auto_translate)
+                autoTranslateItem.isVisible = Locale.getDefault().language.contains(RU_LOCALE)
+                autoTranslateItem.isChecked = checkedAutoAutoTranslate
             }
 
             override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
@@ -136,6 +142,10 @@ class TabsFragment : Fragment() {
                     R.id.switch_set_wallpaper -> {
                         menuItem.isChecked = !menuItem.isChecked
                         tabsViewModel.setAutoWallpapersEnabled(menuItem.isChecked)
+                    }
+                    R.id.enable_auto_translate -> {
+                        menuItem.isChecked = !menuItem.isChecked
+                        tabsViewModel.setAutoTranslateEnabled(menuItem.isChecked)
                     }
                 }
 
@@ -150,6 +160,10 @@ class TabsFragment : Fragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
+    }
+
+    companion object {
+        private val RU_LOCALE = Regex("[ruRUруРУ]")
     }
 
 

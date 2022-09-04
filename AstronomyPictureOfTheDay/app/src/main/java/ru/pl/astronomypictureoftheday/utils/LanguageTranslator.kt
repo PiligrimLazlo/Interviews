@@ -20,7 +20,7 @@ class LanguageTranslator() {
         enRuTranslator = Translation.getClient(options)
     }
 
-    suspend fun downloadModel() {
+    private suspend fun downloadModelIfNeeded() {
         return suspendCoroutine {
             enRuTranslator.downloadModelIfNeeded()
                 .addOnSuccessListener { _ ->
@@ -33,6 +33,7 @@ class LanguageTranslator() {
     }
 
     suspend fun translate(text: String): String {
+        downloadModelIfNeeded()
         return suspendCoroutine {
             enRuTranslator.translate(text)
                 .addOnSuccessListener { translatedText ->

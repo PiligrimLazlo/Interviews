@@ -144,12 +144,6 @@ class PhotoDetailsFragment : Fragment() {
         binding.apply {
             descriptionDetail.justificationMode = Layout.JUSTIFICATION_MODE_INTER_WORD
 
-            descriptionDetail.text = photoEntity.explanation
-
-            if (Locale.getDefault().displayName.contains(RU_LOCALE)) {
-                photoDetailsViewModel.onLoadDetailsWithRuLocale()
-            }
-
             val path = photoEntity.cachePhotoPath
             Glide.with(root.context)
                 .load(
@@ -221,23 +215,6 @@ class PhotoDetailsFragment : Fragment() {
             .show()
     }
 
-    private fun showTranslateDialog() {
-        AlertDialog.Builder(requireContext(), R.style.AlertDialogCustom)
-            .setTitle(getString(R.string.translate))
-            .setMessage(getString(R.string.tanslation_detected_message))
-            .setCancelable(false)
-            .setNegativeButton(getString(R.string.cancel)) { dialog, _ ->
-                photoDetailsViewModel.translateNegativePressed()
-                dialog.dismiss()
-            }
-            .setPositiveButton(getString(R.string.ok)) { dialog, which ->
-                photoDetailsViewModel.translatePositivePressed()
-                dialog.dismiss()
-            }
-            .create()
-            .show()
-    }
-
 
     private fun updateUi(state: PhotoDetailsState) {
         binding.apply {
@@ -260,24 +237,15 @@ class PhotoDetailsFragment : Fragment() {
             photoDetailsViewModel.userMessageShown()
 
 
-            //показываем диалог если не нажимал cancel и ок, то есть первый раз
-            if (Locale.getDefault().displayName.contains(RU_LOCALE) &&
-                !state.isTranslateDialogShown
-            ) {
-                showTranslateDialog()
-            }
-            state.translatedDescription?.let {
-                Log.d(TAG, it)
-                binding.descriptionDetail.text = it
+            if (state.translatedDescription != null) {
+                binding.descriptionDetail.text = state.translatedDescription
+            } else {
+                binding.descriptionDetail.text = photoEntity.explanation
             }
 
         }
     }
 
-
-    companion object {
-        private val RU_LOCALE = Regex("[ruRUруРУ]")
-    }
 }
 
 private class GlideRequestListener(private val callback: () -> Unit) : RequestListener<Drawable> {
