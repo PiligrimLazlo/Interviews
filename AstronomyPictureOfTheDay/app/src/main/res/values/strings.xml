@@ -34,5 +34,8 @@
     <string name="translation_detected_message">Russian language detected. Do you want to download ML kit for translation? (30mb)</string>
     <string name="turn_on_auto_translate">Auto translate of descriptions (30mb)</string>
     <string name="ru_locale_regex" translatable="false">[ruRUруРУ]</string>
+    <string name="about">About</string>
+    <string name="about_developer_title">About developer</string>
+    <string name="about_developer_message">Developer: Polushkin Vasiliy\n\nTelegram: https://t.me/PiligrimLazlo\n\nE-mail: polushkin.vasiliy@yandex.ru</string>
 
 </resources>

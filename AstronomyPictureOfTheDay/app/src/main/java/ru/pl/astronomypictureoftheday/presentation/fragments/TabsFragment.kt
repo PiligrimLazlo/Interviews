@@ -2,8 +2,13 @@ package ru.pl.astronomypictureoftheday.presentation.fragments
 
 import android.content.Context
 import android.os.Bundle
+import android.text.SpannableString
+import android.text.method.LinkMovementMethod
+import android.text.util.Linkify
 import android.util.Log
 import android.view.*
+import android.widget.TextView
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.content.ContextCompat
 import androidx.core.util.Pair
@@ -147,6 +152,9 @@ class TabsFragment : Fragment() {
                         menuItem.isChecked = !menuItem.isChecked
                         tabsViewModel.setAutoTranslateEnabled(menuItem.isChecked)
                     }
+                    R.id.about -> {
+                        showAboutDialog()
+                    }
                 }
 
                 return true
@@ -155,6 +163,23 @@ class TabsFragment : Fragment() {
         }, viewLifecycleOwner, Lifecycle.State.STARTED)
     }
 
+    private fun showAboutDialog() {
+        val description = SpannableString(getString(R.string.about_developer_message))
+        Linkify.addLinks(description, Linkify.ALL)
+
+        val dialog = AlertDialog.Builder(requireContext())
+            .setTitle(getString(R.string.about_developer_title))
+            .setMessage(description)
+            .setCancelable(true)
+            .setPositiveButton(getString(R.string.ok)) { dialog, _ ->
+                dialog.dismiss()
+            }
+            .create()
+        dialog.show()
+        dialog.findViewById<TextView>(android.R.id.message)?.movementMethod =
+            LinkMovementMethod.getInstance()
+
+    }
 
 
     override fun onDestroyView() {

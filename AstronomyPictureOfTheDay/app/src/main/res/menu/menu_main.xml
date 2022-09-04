@@ -16,4 +16,8 @@
         android:id="@+id/enable_auto_translate"
         android:checkable="true"
         android:title="@string/turn_on_auto_translate" />
+
+    <item
+        android:id="@+id/about"
+        android:title="@string/about" />
 </menu>
