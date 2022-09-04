@@ -117,7 +117,7 @@ class PhotoDetailsViewModel @Inject constructor(
 
     override fun onCleared() {
         super.onCleared()
-        languageTranslator.close()
+        //languageTranslator.close()
     }
 
 }

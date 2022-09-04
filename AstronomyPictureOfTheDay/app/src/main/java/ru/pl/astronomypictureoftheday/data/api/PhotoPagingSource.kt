@@ -16,6 +16,9 @@ class TopPhotoPagingSource(
     private val photoApi: PhotoApi,
     private val dateRange: Pair<Long, Long>? = null
 ) : PagingSource<Int, PhotoDto>() {
+
+    private var validateNotLastPage = true
+
     override suspend fun load(params: LoadParams<Int>): LoadResult<Int, PhotoDto> {
         return try {
             val pageIndex = params.key ?: 1
@@ -38,9 +41,8 @@ class TopPhotoPagingSource(
 
             val prev = if (pageIndex == 1) null else pageIndex - 1
             val next =
-                //todo fix когда размер dateRange==LoadSize, то он выдает не null,
-                // а "следующую" несуществующую страницу и показывает кнопку try again
-                if (favouritePhotoList.size == params.loadSize) pageIndex + 1 else null
+                if (favouritePhotoList.size == params.loadSize && validateNotLastPage) pageIndex + 1
+                else null
 
             LoadResult.Page(favouritePhotoList, prev, next)
         } catch (e: Exception) {
@@ -57,11 +59,11 @@ class TopPhotoPagingSource(
         return page.nextKey?.minus(1) ?: page.prevKey?.plus(1)
     }
 
-    private fun getPeriod(size: Int, pageIndex: Int): Pair<String, String> {
+    private fun getPeriod(loadSize: Int, pageIndex: Int): Pair<String, String> {
         val nowDateTime = LocalDateTime.now()
 
-        val start = nowDateTime.minusDays((size * pageIndex).toLong())
-        val end = start.plusDays(size.toLong())
+        val start = nowDateTime.minusDays((loadSize * pageIndex).toLong())
+        val end = start.plusDays(loadSize.toLong())
 
         val formatter = DateTimeFormatter.ofPattern(SERVER_DATE_FORMAT)
         val startDate = (start.plusDays(1)).format(formatter)
@@ -71,7 +73,7 @@ class TopPhotoPagingSource(
     }
 
     private fun getPeriod(
-        size: Int, pageIndex: Int, from: Long, to: Long
+        loadSize: Int, pageIndex: Int, from: Long, to: Long
     ): Pair<String, String> {
 
         val fromDate = LocalDateTime.ofInstant(
@@ -82,8 +84,8 @@ class TopPhotoPagingSource(
             Instant.ofEpochMilli(to),
             TimeZone.getDefault().toZoneId()
         )
-        var start = toDate.minusDays((size * pageIndex).toLong())
-        var end = start.plusDays(size.toLong())
+        var start = toDate.minusDays((loadSize * pageIndex).toLong())
+        val end = start.plusDays(loadSize.toLong())
         start = start.plusDays(1)
 
         if (start < fromDate) {
@@ -93,6 +95,7 @@ class TopPhotoPagingSource(
         Log.d(TAG, "start: $start, end: $end")
         Log.d(TAG, "pageSize from getPeriod(range): ${ChronoUnit.DAYS.between(start, end)}")
 
+        calculateItemNumbersOdd(fromDate, toDate, loadSize, pageIndex)
 
         val formatter = DateTimeFormatter.ofPattern(SERVER_DATE_FORMAT)
         val startDate = start.format(formatter)
@@ -101,7 +104,19 @@ class TopPhotoPagingSource(
         return Pair(startDate, endDate)
     }
 
-    companion object {
-        private const val MILLIS_IN_DAY = 86400000L
+    // расчет дополнительного условия nextPage. При числе страниц == loadSize || %loadSize == 0
+    // То есть если loadSize == 10, то при числе страницы 10, 20, 30 и так далее
+    // для nextPage нужно доп условие, чтобы выдавал null
+    private fun calculateItemNumbersOdd(
+        fromDate: LocalDateTime?,
+        toDate: LocalDateTime?,
+        loadSize: Int,
+        pageIndex: Int
+    ) {
+        val daysBetween = (ChronoUnit.DAYS.between(fromDate, toDate) + 1).toInt()
+        val pageCount = daysBetween / loadSize
+        if (pageCount == pageIndex)
+            validateNotLastPage = (daysBetween % loadSize) != 0
     }
+
 }
