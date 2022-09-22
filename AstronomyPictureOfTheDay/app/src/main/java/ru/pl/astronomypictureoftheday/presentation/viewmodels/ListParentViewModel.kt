@@ -24,7 +24,7 @@ open class ListParentViewModel @Inject constructor(
     fun onSaveFavouriteButtonPressed(photo: PhotoEntity, filesDir: File) {
         viewModelScope.launch(Dispatchers.IO) {
             //сохраняем запись в базу и фото в кэш
-            val filePath = imageManager.getInternalImageFullPathFile(photo.title, filesDir)
+            val filePath = imageManager.getInternalImageFullPathFileNotHd(photo.title, filesDir)
             if (getPhotoDbUseCase(photo.title) == null) {
                 addPhotoDbUseCase(
                     photo.copy(

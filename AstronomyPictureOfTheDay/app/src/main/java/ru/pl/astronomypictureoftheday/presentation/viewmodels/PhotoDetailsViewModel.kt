@@ -13,6 +13,7 @@ import ru.pl.astronomypictureoftheday.domain.PhotoEntity
 import ru.pl.astronomypictureoftheday.domain.usecase.StoredTranslateTurnedOnUseCase
 import ru.pl.astronomypictureoftheday.utils.ImageManager
 import ru.pl.astronomypictureoftheday.utils.LanguageTranslator
+import java.io.File
 import javax.inject.Inject
 
 private const val TAG = "PhotoDetailsViewModel"
@@ -42,15 +43,23 @@ class PhotoDetailsViewModel @Inject constructor(
     }
 
 
-    suspend fun saveImageToPictureFolder() {
+    suspend fun saveImageToPictureFolder(filesDir: File) {
         withContext(Dispatchers.IO) {
             _detailsState.update { it.copy(isSavingPhoto = true) }
 
-            val filePath = imageManager.getPublicImageFullPathFile(photo.title)
-            val saved = imageManager.savePhoto(photo.imageHdUrl, filePath)
+            val filePathInCache = imageManager.getInternalImageFullPathFileHd(photo.title, filesDir)
+            val filePathInGallery = imageManager.getPublicImageFullPathFile(photo.title)
+
+            if (!filePathInCache.exists()) {
+                imageManager.savePhoto(photo.imageHdUrl, filePathInCache)
+            }
+
+            val savedToGallery = imageManager.savePhoto(
+                photo.imageHdUrl, filePathInGallery, filePathInCache
+            )
 
             _detailsState.update { it.copy(isSavingPhoto = false) }
-            if (saved != null) {
+            if (savedToGallery != null) {
                 _detailsState.update {
                     it.copy(userMessage = application.getString(R.string.successfully_saved_picture))
                 }
@@ -63,12 +72,12 @@ class PhotoDetailsViewModel @Inject constructor(
     }
 
 
-    suspend fun setWallpapers(choicePosition: Int) {
+    suspend fun setWallpapers(choicePosition: Int, filesDir: File) {
         withContext(Dispatchers.IO) {
             _detailsState.update { it.copy(isSettingWallpaper = true) }
 
             val wallpaperManager = WallpaperManager.getInstance(application)
-            val filePath = imageManager.getPublicImageFullPathFile(photo.title)
+            val filePath = imageManager.getInternalImageFullPathFileHd(photo.title, filesDir)
             val bitmap = imageManager.loadPhotoFromCache(filePath)
                 ?: imageManager.loadBitmapFromNet(photo.imageHdUrl)
 
@@ -110,8 +119,8 @@ class PhotoDetailsViewModel @Inject constructor(
 
     private fun loadTranslation() {
         viewModelScope.launch {
-                val translatedText = languageTranslator.translate(photo.explanation)
-                _detailsState.update { it.copy(translatedDescription = translatedText) }
+            val translatedText = languageTranslator.translate(photo.explanation)
+            _detailsState.update { it.copy(translatedDescription = translatedText) }
         }
     }
 

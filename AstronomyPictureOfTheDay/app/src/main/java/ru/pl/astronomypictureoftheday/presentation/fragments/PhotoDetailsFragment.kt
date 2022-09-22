@@ -69,7 +69,7 @@ class PhotoDetailsFragment : Fragment() {
             }
         }
         viewLifecycleOwner.lifecycleScope.launch {
-            photoDetailsViewModel.saveImageToPictureFolder()
+            photoDetailsViewModel.saveImageToPictureFolder(requireContext().filesDir)
         }
     }
 
@@ -106,7 +106,7 @@ class PhotoDetailsFragment : Fragment() {
         binding.saveToGalleryBtn.setOnClickListener {
             if (isWriteInMemoryPermissionGranted()) {
                 viewLifecycleOwner.lifecycleScope.launch {
-                    photoDetailsViewModel.saveImageToPictureFolder()
+                    photoDetailsViewModel.saveImageToPictureFolder(requireContext().filesDir)
                 }
             } else {
                 requestWriteInMemoryPermission()
@@ -115,7 +115,7 @@ class PhotoDetailsFragment : Fragment() {
         binding.setWallpapersBtn.setOnClickListener {
             showWallpaperDialog { position ->
                 viewLifecycleOwner.lifecycleScope.launch {
-                    photoDetailsViewModel.setWallpapers(position)
+                    photoDetailsViewModel.setWallpapers(position, requireContext().filesDir)
                 }
             }
         }

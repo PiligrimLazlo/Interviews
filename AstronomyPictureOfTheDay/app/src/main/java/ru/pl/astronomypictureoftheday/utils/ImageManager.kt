@@ -16,7 +16,7 @@ class ImageManager @Inject constructor() {
 
     //user's saved photos
     fun getPublicImageFullPathFile(title: String): File {
-        val fileName = getFormattedFileName(title)
+        val fileName = getFormattedFileName(title, "_${System.currentTimeMillis()}")
         return File(
             Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES),
             fileName
@@ -24,14 +24,20 @@ class ImageManager @Inject constructor() {
     }
 
     //room caches photos
-    fun getInternalImageFullPathFile(title: String, filesDir: File): File {
+    fun getInternalImageFullPathFileNotHd(title: String, filesDir: File): File {
         val fileName = getFormattedFileName(title)
         return File(filesDir, fileName)
     }
 
-    private fun getFormattedFileName(title: String): String {
+    //gallery and wallpaper caches photos
+    fun getInternalImageFullPathFileHd(title: String, filesDir: File): File {
+        val fileName = getFormattedFileName(title, "_hd")
+        return File(filesDir, fileName)
+    }
+
+    private fun getFormattedFileName(title: String, additionInName: String = ""): String {
         val formattedTitle = title.replace(Regex("[: ]"), "")
-        return "NasaAPOD_$formattedTitle.jpg"
+        return "NasaAPOD_${formattedTitle}$additionInName.jpg"
     }
 
     //todo Проблема: при ручном удалении фото с реального устройства (сяоми)
@@ -40,16 +46,22 @@ class ImageManager @Inject constructor() {
     //todo Добавить временнУю метку к каждому фото при сохранении
     //todo Далее чтобы проверить лежит ли такая фотка в памяти, нужно проходить по всем фоткам
     //todo и сравнивать по регулярке что-то типо "имя файла, кроме цифр времени в конце"
-    fun savePhoto(urlSource: String, absPathToSave: File): Bitmap? {
-        var bitmap = loadPhotoFromCache(absPathToSave)
+
+    //todo проще: сохранять изначально хд картикну в кэш внутренней памяти приложения (как рум кэш)
+    //todo проще: далее брать инфу оттуда, а в галерею каждый раз сохранять с меткой времени
+    fun savePhoto(urlSource: String, absPathToSave: File, cachePath: File? = null): Bitmap? {
+        var bitmap = if (cachePath == null) {
+            loadPhotoFromCache(absPathToSave)
+        } else {
+            loadPhotoFromCache(cachePath)
+        }
         if (bitmap == null) {
             bitmap = loadBitmapFromNet(urlSource)
-            if (bitmap != null) {
-                FileOutputStream(absPathToSave).use {
-                    bitmap.compress(Bitmap.CompressFormat.JPEG, 80, it)
-                }
+        }
+        if (bitmap != null) {
+            FileOutputStream(absPathToSave).use {
+                bitmap.compress(Bitmap.CompressFormat.JPEG, 80, it)
             }
-
         }
         return bitmap
     }
