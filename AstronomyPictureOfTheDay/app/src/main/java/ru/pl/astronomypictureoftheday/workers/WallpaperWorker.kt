@@ -18,7 +18,7 @@ class WallpaperWorker(
         val photo = fetchPhotoNetUseCase()
 
         val wallpaperManager = WallpaperManager.getInstance(context)
-        val filePath = imageManager.getPublicImageFullPathFile(photo.title)
+        val filePath = imageManager.getInternalImageFullPathFileHd(photo.title, context.filesDir)
         val bitmap = imageManager.loadPhotoFromCache(filePath)
             ?: imageManager.loadBitmapFromNet(photo.imageHdUrl)
             ?: return Result.failure()
